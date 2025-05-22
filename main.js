@@ -87,7 +87,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
                 let population = d[year];
                 let medals = countryMedals[d.NOC].medals;
         
-                if( population != null && medals != null )
+                if( population && medals )
                 {
                     const dataPoint = {
                     NOC: d.NOC,
@@ -125,7 +125,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
                 let gdp = d[year];
                 let medals = countryMedals[d.NOC].medals;
         
-                if( gdp != null && medals != null )
+                if( gdp && medals )
                 {
                     const dataPoint = {
                     NOC: d.NOC,
