@@ -19,24 +19,27 @@
   <body>
     <div class="w3-content w3-display-container" style="width:100%">
       <!-- slide 1 -->
-      <div class="mySlides w3-container">
-        <h1><b>Slide 1</b></h1>
-        <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid meet"></svg>
+      <div id = "svg1" class="mySlides w3-container">
       </div>
       <!-- slide 2 -->
-      <div class="mySlides w3-container">
-        <h1><b>Slide 2</b></h1>
-        <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid meet"></svg>
+      <div id = "svg2" class="mySlides w3-container">
       </div>
       <!-- slide 3 -->
-      <div class="mySlides w3-container">
-        <h1><b>Slide 3</b></h1><svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid meet"></svg>
+      <div id = "svg3" class="mySlides w3-container">
       </div>
       <!-- slide 4 -->
-      <div class="mySlides w3-container">
-        <h1><b>Slide 4</b></h1>
-        <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid meet"></svg>
+      <div id = "svg4" class="mySlides w3-container">
       </div>
+      <!-- slide 5 -->
+      <div id = "svg5" class="mySlides w3-container">
+      </div>
+      <!-- slide 6 -->
+      <div id = "svg6" class="mySlides w3-container">
+      </div>
+      <!-- slide 7 -->
+      <div id = "svg7" class="mySlides w3-container">
+      </div>
+
 
       <!-- navigation stuff -->
       <div class="w3-center w3-container w3-section w3-large w3-text-white" style="width:100%">
@@ -48,8 +51,14 @@
         <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(2)"></span>
         <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(3)"></span>
         <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(4)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(5)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(6)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(7)"></span>
       </div>
     </div>
+
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+	  <script src="main.js"></script>
 
     <!-- logic for how to navigate between slides -->
     <script>
