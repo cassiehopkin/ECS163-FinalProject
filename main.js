@@ -281,6 +281,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
     gdpPlot1960 = makeScatterPlot(gdpData.find( c => c.year == years[1] ).data, "gdp", years[1], 5);
     gdpPlot2000 = makeScatterPlot(gdpData.find( c => c.year == years[2] ).data, "gdp", years[2], 6);
 
+
     // host plot
     function makeHostPlot(data, i){
         // measurements
@@ -404,6 +405,120 @@ Promise.all(csvs.map(file => d3.csv(file)))
     }
     hostPlot = makeHostPlot(hostData, 7);
 
+    // stream graph 
+    function makeStreamGraph(data, i) {
+        //Filtering Data for invalid rows
+        const filtered = data.filter(d => d.Medal && d.Medal !== "NA");
+        //totalling medals per country
+        const totals = d3.rollups(filtered, v => v.length, d => d.NOC)
+          .sort((a, b) => d3.descending(a[1], b[1]))
+          .slice(0, 10)
+          .map(d => d[0]);
+      
+        const years = Array.from(new Set(filtered.map(d => +d.Edition))).sort();
+      
+        // Reshaping Data for stream graph
+        const streamData = years.map(year => {
+          const row = { year };
+          for (const noc of totals) {
+            row[noc] = filtered.filter(d => +d.Edition === year && d.NOC === noc).length;
+          }
+          return row;
+        });
+        
+        //Extract top 10
+        const keys = Object.keys(streamData[0]).filter(k => k !== "year");
+        const stack = d3.stack().keys(keys).offset(d3.stackOffsetWiggle);
+        const series = stack(streamData);
+
+        //Dimensions
+        const width = 1200;
+        const height = 500;
+        const margin = { top: 50, right: 200, bottom: 40, left: 60 };
+
+        //Create svg
+        const svg = d3.select(`#svg${i}`)
+          .append("svg")
+          .attr("viewBox", [0, 0, width, height]);
+          
+        //X scale (linear)
+        const x = d3.scaleLinear()
+          .domain(d3.extent(streamData, d => d.year))
+          .range([margin.left, width - margin.right]);
+
+        //Y scale (linear)
+        const y = d3.scaleLinear()
+          .domain([
+            d3.min(series, layer => d3.min(layer, d => d[0])),
+            d3.max(series, layer => d3.max(layer, d => d[1]))
+          ])
+          .range([height - margin.bottom, margin.top]);
+          
+        //Color Scheme
+        const color = d3.scaleOrdinal()
+          .domain(keys)
+          .range(d3.schemeTableau10);
+      
+        //Generate area for stream graph + smoothing 
+        const area = d3.area()
+          .curve(d3.curveBasis)
+          .x(d => x(d.data.year))
+          .y0(d => y(d[0]))
+          .y1(d => y(d[1]));
+          
+        //Draw layers
+        svg.selectAll("path")
+          .data(series)
+          .join("path")
+            .attr("fill", d => color(d.key))
+            .attr("d", area)
+          .append("title")
+            .text(d => d.key);
+          
+        //Create x axis with labels
+        svg.append("g")
+          .attr("transform", `translate(0,${height - margin.bottom})`)
+          .call(d3.axisBottom(x).tickFormat(d3.format("d")))
+          .attr("font-weight", "bold")
+          .style("font-size", "15px");
+          
+        //Create y axis with no labels + ticks
+        svg.append("g")
+          .attr("transform", `translate(${margin.left},0)`)
+          .call(d3.axisLeft(y).tickFormat("").tickSize(0))
+          .select(".domain")
+          .attr("stroke", "black");
+          
+        //Title
+        svg.append("text")
+          .attr("x", width / 6)
+          .attr("y", margin.top - 10)
+          .attr("font-weight", "bold")
+          .style("font-size", "25px")
+          .text("Olympic Medals by Country (Top 10 Stream Graph)");
+          
+        //Legend
+        const legend = svg.append("g")
+          .attr("transform", `translate(${width - margin.right + 10}, ${margin.top})`);
+      
+        keys.forEach((key, i) => {
+          const row = legend.append("g")
+            .attr("transform", `translate(0, ${i * 20})`);
+      
+          row.append("rect")
+            .attr("width", 12)
+            .attr("height", 12)
+            .attr("fill", color(key));
+      
+          row.append("text")
+            .attr("x", 16)
+            .attr("y", 10)
+            .text(key)
+            .attr("alignment-baseline", "middle")
+            .attr("font-size", "12px");
+        });
+      }
+    streamgraph = makeStreamGraph(rawOlympicData, 8);
 
   })
   .catch(function(error) {
