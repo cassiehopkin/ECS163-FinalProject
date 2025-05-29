@@ -33,157 +33,175 @@ Promise.all(csvs.map(file => d3.csv(file)))
     const rawNocData = dataArray[3]
 
     // Process Data ///////////////////////////////////////////////////////////////////////////////////
-    function processOlympicData()
-    {
-        let formattedData = [];
-        const allYears = {};
-
-        rawOlympicData.forEach(d => {
-            if(!(d["Edition"] in allYears))
-            {
-            const newYear = {
-                year: d["Edition"],
-                host: d["HostNOC"],
-                countryMedals: {}
-            }
-            allYears[d["Edition"]] = newYear;
-            }
-            if(d["NOC"] in allYears[d["Edition"]].countryMedals)
-            { 
-                allYears[d["Edition"]].countryMedals[d["NOC"]].medals = 
-                allYears[d["Edition"]].countryMedals[d["NOC"]].medals + 1;
-            }
-            else if ( Object.values(d) != null && 
-                        rawNocData.some(c => c["NOC"] == d["NOC"]) ) 
-            {
-                const newCountryMedal = {
-                NOC: d["NOC"],
-                medals: 1
-                }
-                allYears[d["Edition"]].countryMedals[d["NOC"]] = newCountryMedal;
-            }
-        })
-        
-        Object.keys(allYears).forEach(d => {
-            formattedData.push(allYears[d]);
-        })
-        
-        return formattedData;
+    const nocMap = new Map(rawNocData.map(d => [d.NOC, d.Country]));
+    function formatPopulation(value) {
+      return (value / 1000).toFixed(2) + " million";
     }
+
+    function processOlympicData() {
+      let formattedData = [];
+      const allYears = {};
+
+      rawOlympicData.forEach(d => {
+        if (!(d.Edition in allYears)) {
+          allYears[d.Edition] = {
+            year: d.Edition,
+            host: d.HostNOC,
+            countryMedals: {}
+          };
+        }
+
+        const country = allYears[d.Edition].countryMedals[d.NOC];
+        if (country) {
+          country.medals++;
+          country.gold += d.Medal === "Gold" ? 1 : 0;
+          country.silver += d.Medal === "Silver" ? 1 : 0;
+          country.bronze += d.Medal === "Bronze" ? 1 : 0;
+        } else if (rawNocData.some(c => c.NOC === d.NOC)) {
+          allYears[d.Edition].countryMedals[d.NOC] = {
+            NOC: d.NOC,
+            medals: 1,
+            gold: d.Medal === "Gold" ? 1 : 0,
+            silver: d.Medal === "Silver" ? 1 : 0,
+            bronze: d.Medal === "Bronze" ? 1 : 0
+          };
+        }
+      });
+
+      for (const year in allYears) {
+        formattedData.push(allYears[year]);
+      }
+
+      return formattedData;
+    }
+
 
     olympicData = processOlympicData();
 
-    function processPopulationData()
-    {
-        let populationData = [];
-        
-        years.forEach(year => {
-            let data = [];
-            let countryMedals = olympicData.find( c => c.year == year ).countryMedals;
-
-            rawPopulationData.forEach(d => {
-                if( d.NOC in countryMedals )
-                { 
-                let population = d[year];
-                let medals = countryMedals[d.NOC].medals;
-        
-                if( population && medals )
-                {
-                    const dataPoint = {
-                    NOC: d.NOC,
-                    population: Number(population),
-                    medals: medals,
-                    id: "normal"
-                    }
-                    data.push(dataPoint);
-                }
-                }
-            })
-
-            const dataPoint = {
-            year: year,
-            data: data
-            }
-            populationData.push(dataPoint);
-        })
-        
-        return populationData;
+    function processPopulationData(olympicData) {
+      return years.map(year => {
+        const countryMedals = olympicData.find(c => c.year == year).countryMedals;
+        const data = rawPopulationData.filter(d => d.NOC in countryMedals).map(d => {
+          const pop = d[year];
+          const cm = countryMedals[d.NOC];
+          return pop && cm ? {
+            NOC: d.NOC,
+            population: +pop, 
+            medals: cm.medals,
+            gold: cm.gold,
+            silver: cm.silver,
+            bronze: cm.bronze,
+            id: "normal"
+          } : null;
+        }).filter(Boolean);
+        return { year, data };
+      });
     }
-    populationData = processPopulationData();
+    populationData = processPopulationData(olympicData);
 
-    function processGdpData()
-    {
-        let gdpData = [];
-        
-        years.forEach(year => {
-            let data = [];
-            let countryMedals = olympicData.find( c => c.year == year ).countryMedals;
+      function processGdpData(olympicData) {
+        return years.map(year => {
+          const countryMedals = olympicData.find(c => c.year == year).countryMedals;
+          const data = rawGdpData.filter(d => d.NOC in countryMedals).map(d => {
+            const gdp = d[year];
+            const cm = countryMedals[d.NOC];
+            return gdp && cm ? {
+              NOC: d.NOC,
+              gdp: +gdp,
+              medals: cm.medals,
+              gold: cm.gold,
+              silver: cm.silver,
+              bronze: cm.bronze,
+              id: "normal"
+            } : null;
+          }).filter(Boolean);
+          return { year, data };
+        });
+      }
 
-            rawGdpData.forEach(d => {
-                if( d.NOC in countryMedals )
-                { 
-                let gdp = d[year];
-                let medals = countryMedals[d.NOC].medals;
-        
-                if( gdp && medals )
-                {
-                    const dataPoint = {
-                    NOC: d.NOC,
-                    gdp: Number(gdp),
-                    medals: medals,
-                    id: "normal"
-                    }
-                    data.push(dataPoint);
-                }
-                }
-            })
+    gdpData = processGdpData(olympicData);
 
-            const dataPoint = {
-            year: year,
-            data: data
-            }
-            gdpData.push(dataPoint);
-        })
-        
-        return gdpData;
-    }
+    // function processHostData(year){
+    //     let hostData = [];
 
-    gdpData = processGdpData();
-
-    function processHostData(year){
-        let hostData = [];
-
-        olympicData.forEach(d => {
-            let medal_sum = 0;
+    //     olympicData.forEach(d => {
+    //         let medal_sum = 0;
             
-            Object.keys(d.countryMedals).forEach(c => {
+    //         Object.keys(d.countryMedals).forEach(c => {
                 
-                let id = d.countryMedals[c].NOC == d.host ? "host" : "non-host";
-                medal_sum = d.countryMedals[c].NOC == d.host ? 
-                            medal_sum : medal_sum + d.countryMedals[c].medals;
+    //             let id = d.countryMedals[c].NOC == d.host ? "host" : "non-host";
+    //             medal_sum = d.countryMedals[c].NOC == d.host ? 
+    //                         medal_sum : medal_sum + d.countryMedals[c].medals;
                 
-                const dataPoint = {
-                NOC: d.countryMedals[c].NOC,
-                year: d.year,
-                medals: d.countryMedals[c].medals,
-                id: id
-                }
-                hostData.push(dataPoint);
+    //             const dataPoint = {
+    //             NOC: d.countryMedals[c].NOC,
+    //             year: d.year,
+    //             medals: d.countryMedals[c].medals,
+    //             id: id
+    //             }
+    //             hostData.push(dataPoint);
                 
-            })
-            const dataPoint = {
-                NOC: "average",
-                year: d.year,
-                medals: medal_sum / (Object.keys(d.countryMedals).length - 1),
-                id: "average"
-            }
-            hostData.push(dataPoint);
-        })
-        return hostData;
-    }
-    hostData = processHostData();
+    //         })
+    //         const dataPoint = {
+    //             NOC: "average",
+    //             year: d.year,
+    //             medals: medal_sum / (Object.keys(d.countryMedals).length - 1),
+    //             id: "average"
+    //         }
+    //         hostData.push(dataPoint);
+    //     })
+    //     return hostData;
+    // }
+    function processHostData(olympicData) {
+    const hostData = [];
+    olympicData.forEach(d => {
+      let medal_sum = 0;
+      for (const c in d.countryMedals) {
+        const cm = d.countryMedals[c];
+        const id = cm.NOC === d.host ? "host" : "non-host";
+        if (id === "non-host") medal_sum += cm.medals;
+        hostData.push({
+          NOC: cm.NOC,
+          year: d.year,
+          medals: cm.medals,
+          gold: cm.gold,
+          silver: cm.silver,
+          bronze: cm.bronze,
+          id
+        });
+      }
+      hostData.push({
+        NOC: "average",
+        year: d.year,
+        medals: medal_sum / (Object.keys(d.countryMedals).length - 1),
+        gold: null,
+        silver: null,
+        bronze: null,
+        id: "average"
+      });
+    });
+    return hostData;
+  }
+    hostData = processHostData(olympicData);
 
     // Visualizations ////////////////////////////////////////////////////////////////////////////
+    function addTooltip(svg, circles, formatter) {
+        const tooltip = d3.select("body").append("div")
+          .style("position", "absolute")
+          .style("background", "#fff")
+          .style("border", "1px solid #ccc")
+          .style("padding", "5px")
+          .style("pointer-events", "none")
+          .style("opacity", 0);
+
+        circles.on("mouseover", function(event, d) {
+            tooltip.transition().duration(200).style("opacity", 0.9);
+            tooltip.html(formatter(d))
+              .style("left", (event.pageX + 10) + "px")
+              .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
+    }
     function makeScatterPlot(data, factor, year, i){
         // console.log(data)
         // measurements
@@ -257,15 +275,13 @@ Promise.all(csvs.map(file => d3.csv(file)))
         }
 
         // Create the dots
-        svg.append("g")      
-            .selectAll("dot")
-            .data(data)
-            .enter()
-            .append("circle")
-            .attr("cx", (d) => x(d[factor]) + 18)
-            .attr("cy", (d) => y(d.medals))
-            .attr("r", (d) =>  5)
-            .style("fill", d => color(d.id));
+        const circles = svg.selectAll("circle").data(data).enter().append("circle")
+          .attr("cx", d => x(d[factor]) + 18)
+          .attr("cy", d => y(d.medals))
+          .attr("r", 5)
+          .style("fill", d => color(d.id));
+
+        addTooltip(svg, circles, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${factor}: ${factor === 'population' ? formatPopulation(d[factor]) : d[factor]}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
         
         return svg.node();
     }
@@ -282,7 +298,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
     gdpPlot2000 = makeScatterPlot(gdpData.find( c => c.year == years[2] ).data, "gdp", years[2], 6);
 
 
-    // host plot
+    // // host plot
     function makeHostPlot(data, i){
         // measurements
         const margin = ({top: 100, right: 200, bottom: 40, left: 40});
@@ -350,16 +366,12 @@ Promise.all(csvs.map(file => d3.csv(file)))
         svg.append("g")
             .call(yAxis)
 
-        // Create the dots
-        svg.append("g")      
-            .selectAll("dot")
-            .data(data)
-            .enter()
-            .append("circle")
-            .attr("cx", (d) => x(d.year) + 18)
-            .attr("cy", (d) => y(d.medals))
-            .attr("r", (d) =>  5)
-            .style("fill", d => color(d.id));
+        // // Create the dots
+        const circles = svg.selectAll("circle").data(data).enter().append("circle")
+                            .attr("cx", d => x(d.year) + 18).attr("cy", d => y(d.medals)).attr("r", 5)
+                            .style("fill", d => color(d.id));
+        
+        addTooltip(svg, circles, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>Year: ${d.year}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
         
         // Create the lines
         svg.append("g")      
