@@ -8,6 +8,11 @@ const csvs = [
 Promise.all(csvs.map((file) => d3.csv(file)))
   .then(function (dataArray) {
     // Global Assets /////////////////////////////////////////////////////////////////////////////////
+    const rawNocData = dataArray[3];
+    const nocToCountry = {};
+    rawNocData.forEach(d => {
+      nocToCountry[d.NOC] = d.Country;
+    });
 
     // The years we wish to make visualizations for
     const years = ["1920", "1960", "2000"];
@@ -39,7 +44,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
     const rawOlympicData = dataArray[0];
     const rawGdpData = dataArray[1];
     const rawPopulationData = dataArray[2];
-    const rawNocData = dataArray[3];
+    //const rawNocData = dataArray[3];
 
     // Process Data ///////////////////////////////////////////////////////////////////////////////////
     function processOlympicData() {
@@ -205,7 +210,9 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .slice(0, 10)
         .map((d) => d[0]);
 
+      //const years = Array.from(new Set(filtered.map((d) => +d.Edition))).sort();
       const years = Array.from(new Set(filtered.map((d) => +d.Edition))).sort();
+
 
       // Reshaping Data for stream graph
       const streamData = years.map((year) => {
@@ -301,23 +308,114 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .y0((d) => yContext(d[0]))
         .y1((d) => yContext(d[1]));
 
-      //Draw Focus layers
+      // Draw Focus layers
+      const tooltip = d3.select("#tooltip");
+
+      const focusLine = svg.append("line")
+        .attr("stroke", "black")
+        .attr("stroke-dasharray", "3,3")
+        .attr("y1", margin.top)
+        .attr("y2", margin.top + focusHeight)
+        .style("display", "none");
+
       svg
-        .selectAll("path")
+        .selectAll("path.area")
         .data(series)
         .join("path")
         .attr("fill", (d) => color(d.key))
         .attr("d", area)
         .attr("class", "area focus")
         .attr("clip-path", "url(#clip)")
-        .append("title")
-        .text((d) => d.key);
+        .on("mouseover", function () {
+          tooltip.style("display", "block");
+          focusLine.style("display", "block");
+          d3.select(this).attr("stroke", "#000").attr("stroke-width", 1.5);
+        })
+        .on("mousemove", function (event, d) {
+          const [mouseX] = d3.pointer(event);
+          // const hoveredYear = Math.round(x.invert(mouseX));
+          const hoveredYear = years.reduce((prev, curr) =>
+            Math.abs(x.invert(mouseX) - curr) < Math.abs(x.invert(mouseX) - prev) ? curr : prev
+          );
+
+          const focusX = x(hoveredYear);
+          focusLine.attr("x1", focusX).attr("x2", focusX);
+
+          const noc = d.key;
+          const countryName = nocToCountry[noc] || noc;
+
+          const yearData = rawOlympicData.filter(
+            o => +o.Edition === hoveredYear && o.NOC === noc && o.Medal !== "NA"
+          );
+
+          if (yearData.length > 0) {
+            const gold = yearData.filter(r => r.Medal === "Gold").length;
+            const silver = yearData.filter(r => r.Medal === "Silver").length;
+            const bronze = yearData.filter(r => r.Medal === "Bronze").length;
+            const total = gold + silver + bronze;
+
+            tooltip
+              .html(
+                `<strong>${countryName}</strong><br>` +
+                `Year: ${hoveredYear}<br>` +
+                `Total Medals: ${total}<br>` +
+                `Gold: ${gold}<br>` +
+                `Silver: ${silver}<br>` +
+                `Bronze: ${bronze}`
+              )
+              .style("left", event.pageX + 15 + "px")
+              .style("top", event.pageY - 28 + "px");
+          } else {
+            // No data — find nearest years with data
+            const allYearsWithMedals = [...new Set(
+              rawOlympicData
+                .filter(o => o.NOC === noc && o.Medal !== "NA")
+                .map(o => +o.Edition)
+            )].sort((a, b) => a - b);
+
+            let lower = null;
+            let higher = null;
+            for (let y of allYearsWithMedals) {
+              if (y < hoveredYear) lower = y;
+              else if (y > hoveredYear && higher === null) higher = y;
+            }
+
+            let suggestion = "<i>No data available</i>";
+            if (lower || higher) {
+              suggestion += "<br>See ";
+              suggestion += lower ? `${countryName} ${lower}` : "";
+              if (lower && higher) suggestion += " or ";
+              suggestion += higher ? `${higher}` : "";
+            }
+
+            tooltip
+              .html(
+                `<strong>${countryName}</strong><br>` +
+                `Year: ${hoveredYear}<br>` +
+                `${suggestion}`
+              )
+              .style("left", event.pageX + 15 + "px")
+              .style("top", event.pageY - 28 + "px");
+          }
+        })
+        .on("mouseleave", function () {   // mouseleave also works for d3 to reduce tracking
+          tooltip.style("display", "none");
+          focusLine.style("display", "none");
+          d3.select(this).attr("stroke", null).attr("stroke-width", null);
+        });
+
+
+
 
       //Create x axis with labels
       const xFocusAxis = svg
         .append("g")
         .attr("transform", `translate(0,${margin.top + focusHeight})`)
-        .call(d3.axisBottom(x).tickFormat(d3.format("d")))
+        //.call(d3.axisBottom(x).tickFormat(d3.format("d")))
+        .call(d3.axisBottom(x)
+          .tickValues(years)
+          .tickFormat(d3.format("d")))
+
         .attr("font-weight", "bold")
         .style("font-size", "15px");
 
