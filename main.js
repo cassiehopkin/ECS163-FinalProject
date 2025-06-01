@@ -4,28 +4,6 @@ Promise.all(csvs.map(file => d3.csv(file)))
   .then(function(dataArray) {
     // Global Assets /////////////////////////////////////////////////////////////////////////////////
 
-    // The years we wish to make visualizations for
-    years = ["1920", "1960", "2000"]
-
-    // Colors of the points in the scatter plots
-    colors = [ { id: "normal", color: "#000000"},
-               { id: "host", color: "#4287f5"},
-               { id: "non-host", color: "#DEDEDE"},
-               { id: "average", color: "#000000"}]
-    
-    function color(id){
-        return colors.find( d => d.id == id ).color
-    }
-
-    // Order of the dot types in the host scatter plot
-    placementHierarchy = [ { id: "host", placement: 2},
-                           { id: "non-host", placement: 0},
-                           { id: "average", placement: 1}]
-
-    function placement(id){
-        return placementHierarchy.find( d => d.id == id ).placement
-    }
-
     // Parse Data //////////////////////////////////////////////////////////////////////////////////////
     const rawOlympicData = dataArray[0]
     const rawGdpData = dataArray[1]
@@ -75,8 +53,13 @@ Promise.all(csvs.map(file => d3.csv(file)))
       return formattedData;
     }
 
-
     olympicData = processOlympicData();
+
+    // Array of all years
+    let years = []
+    olympicData.forEach(d =>{
+        years.push(d.year);
+    })
 
     function processPopulationData(olympicData) {
       return years.map(year => {
@@ -90,8 +73,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
             medals: cm.medals,
             gold: cm.gold,
             silver: cm.silver,
-            bronze: cm.bronze,
-            id: "normal"
+            bronze: cm.bronze
           } : null;
         }).filter(Boolean);
         return { year, data };
@@ -111,8 +93,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
               medals: cm.medals,
               gold: cm.gold,
               silver: cm.silver,
-              bronze: cm.bronze,
-              id: "normal"
+              bronze: cm.bronze
             } : null;
           }).filter(Boolean);
           return { year, data };
@@ -121,68 +102,27 @@ Promise.all(csvs.map(file => d3.csv(file)))
 
     gdpData = processGdpData(olympicData);
 
-    // function processHostData(year){
-    //     let hostData = [];
-
-    //     olympicData.forEach(d => {
-    //         let medal_sum = 0;
-            
-    //         Object.keys(d.countryMedals).forEach(c => {
-                
-    //             let id = d.countryMedals[c].NOC == d.host ? "host" : "non-host";
-    //             medal_sum = d.countryMedals[c].NOC == d.host ? 
-    //                         medal_sum : medal_sum + d.countryMedals[c].medals;
-                
-    //             const dataPoint = {
-    //             NOC: d.countryMedals[c].NOC,
-    //             year: d.year,
-    //             medals: d.countryMedals[c].medals,
-    //             id: id
-    //             }
-    //             hostData.push(dataPoint);
-                
-    //         })
-    //         const dataPoint = {
-    //             NOC: "average",
-    //             year: d.year,
-    //             medals: medal_sum / (Object.keys(d.countryMedals).length - 1),
-    //             id: "average"
-    //         }
-    //         hostData.push(dataPoint);
-    //     })
-    //     return hostData;
-    // }
-    function processHostData(olympicData) {
-    const hostData = [];
-    olympicData.forEach(d => {
-      let medal_sum = 0;
-      for (const c in d.countryMedals) {
-        const cm = d.countryMedals[c];
-        const id = cm.NOC === d.host ? "host" : "non-host";
-        if (id === "non-host") medal_sum += cm.medals;
-        hostData.push({
-          NOC: cm.NOC,
-          year: d.year,
-          medals: cm.medals,
-          gold: cm.gold,
-          silver: cm.silver,
-          bronze: cm.bronze,
-          id
-        });
+      function processHostData(olympicData) {
+          const hostData = [];
+          olympicData.forEach(d => {
+              let data = [];
+              for (const c in d.countryMedals) {
+                  const cm = d.countryMedals[c];
+                  const host = cm.NOC === d.host ? "host" : "non-host";
+                  data.push({
+                      NOC: cm.NOC,
+                      host: host,
+                      medals: cm.medals,
+                      gold: cm.gold,
+                      silver: cm.silver,
+                      bronze: cm.bronze,
+                  });
+              }
+              hostData.push({ year: d.year, data: data });
+          })
+          return hostData;
       }
-      hostData.push({
-        NOC: "average",
-        year: d.year,
-        medals: medal_sum / (Object.keys(d.countryMedals).length - 1),
-        gold: null,
-        silver: null,
-        bronze: null,
-        id: "average"
-      });
-    });
-    return hostData;
-  }
-    hostData = processHostData(olympicData);
+      hostData = processHostData(olympicData);
 
     // Visualizations ////////////////////////////////////////////////////////////////////////////
     function addTooltip(svg, circles, formatter) {
@@ -203,7 +143,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
         .on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
     }
     function makeScatterPlot(data, factor, year, i){
-        // console.log(data)
+
         // measurements
         const margin = ({top: 100, right: 50, bottom: 50, left: 50});
         const height = 450;
@@ -247,10 +187,12 @@ Promise.all(csvs.map(file => d3.csv(file)))
             minVal += 10
         }
         // Create the x axis
-        const x = d3.scaleLog()
-                    .domain([minVal, d3.max(data, d => d[factor])])
-                    .range([margin.left, width - margin.right]); 
-        // console.log(x(minVal))
+        const x = factor == "host" ?
+            d3.scaleBand()
+               .domain(data.map(d => d[factor]))
+          : d3.scaleLog()
+               .domain([minVal, d3.max(data, d => d[factor])])
+        x.range([margin.left, width - margin.right]);
 
         const xAxis = g => g
             .attr("transform", "translate(0," + (height - margin.bottom) + ")")
@@ -276,146 +218,28 @@ Promise.all(csvs.map(file => d3.csv(file)))
 
         // Create the dots
         const circles = svg.selectAll("circle").data(data).enter().append("circle")
-          .attr("cx", d => x(d[factor]) + 18)
+          .attr("cx", d => factor == "host" ? x(d[factor]) + x.bandwidth()/2 : x(d[factor]))
           .attr("cy", d => y(d.medals))
           .attr("r", 5)
-          .style("fill", d => color(d.id));
+          .style("fill", "black");
 
         addTooltip(svg, circles, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${factor}: ${factor === 'population' ? formatPopulation(d[factor]) : d[factor]}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
-        
-        return svg.node();
     }
 
     // population plots
-    console.log(populationData.find( c => c.year == years[0] ).data)
-    populationPlot1920 = makeScatterPlot(populationData.find( c => c.year == years[0] ).data, "population", years[0], 1);
-    populationPlot1960 = makeScatterPlot(populationData.find( c => c.year == years[1] ).data, "population", years[1], 2);
-    populationPlot2000 = makeScatterPlot(populationData.find( c => c.year == years[2] ).data, "population", years[2], 3);
+    makeScatterPlot(populationData.find( c => c.year == "1920" ).data, "population", "1920", 1);
+    makeScatterPlot(populationData.find( c => c.year == "1960" ).data, "population", "1960", 2);
+    makeScatterPlot(populationData.find( c => c.year == "2000" ).data, "population", "2000", 3);
 
     // gdp plots
-    gdpPlot1920 = makeScatterPlot(gdpData.find( c => c.year == years[0] ).data, "gdp", years[0], 4);
-    gdpPlot1960 = makeScatterPlot(gdpData.find( c => c.year == years[1] ).data, "gdp", years[1], 5);
-    gdpPlot2000 = makeScatterPlot(gdpData.find( c => c.year == years[2] ).data, "gdp", years[2], 6);
+    makeScatterPlot(gdpData.find( c => c.year == "1920" ).data, "gdp", "1920", 4);
+    makeScatterPlot(gdpData.find( c => c.year == "1960" ).data, "gdp", "1960", 5);
+    makeScatterPlot(gdpData.find( c => c.year == "2000" ).data, "gdp", "2000", 6);
 
-
-    // // host plot
-    function makeHostPlot(data, i){
-        // measurements
-        const margin = ({top: 100, right: 200, bottom: 40, left: 40});
-        const height = 450;
-        const width = 1300;
-
-        // Sort data for placement
-        data.sort(function(x, y){
-                return d3.ascending(placement(x.id), placement(y.id));
-        })
-
-        // Filter data for lines
-        const lineData = data.filter(d => ( d.id == "host" || d.id == "average"));
-        var groupedLineData = d3.group(lineData, d => d.id);
-        
-        // Create the svg
-        const svg = d3.select(`#svg${i}`)
-                .append("svg")
-                .attr("viewBox", [0, 0, width, height])
-
-        // Create the title
-        svg.append("text")
-                .attr("text-anchor", "middle")
-                .attr("x", (margin.left + width - margin.right) / 2)
-                .attr("y", margin.top / 2)
-                .attr("font-weight", "bold")
-                .style("font-size", "25px")
-                .text("Host Plot");
-        
-        // Create the x axis label
-        svg.append("text")
-                .attr("text-anchor", "middle")
-                .attr("x", (margin.left + width - margin.right) / 2)
-                .attr("y", height - 5)
-                .attr("font-weight", "bold")
-                .style("font-size", "15px")
-                .text("year");
-
-        // Create the y axis label
-        svg.append("text")
-                .attr("text-anchor", "start")
-                .attr("x", margin.left - 20)
-                .attr("y", margin.top - 15)
-                .attr("font-weight", "bold")
-                .style("font-size", "15px")
-                .text("medals won");
-        
-        // Create the x axis
-        const x = d3.scaleBand()
-                    .domain(data.map(d => d.year))
-                    .range([margin.left, width - margin.right]); 
-        const xAxis = g => g
-            .attr("transform", "translate(0," + (height - margin.bottom) + ")")
-            .call(d3.axisBottom(x))
-        svg.append("g")
-            .call(xAxis)
-
-        // Create the y axis
-        const y = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.medals)])
-                    .rangeRound([height - margin.bottom, margin.top]);
-        const yAxis = g => g
-            .attr("transform", "translate(" + (margin.left) + ",0)")
-            .call(d3.axisLeft(y))
-        svg.append("g")
-            .call(yAxis)
-
-        // // Create the dots
-        const circles = svg.selectAll("circle").data(data).enter().append("circle")
-                            .attr("cx", d => x(d.year) + 18).attr("cy", d => y(d.medals)).attr("r", 5)
-                            .style("fill", d => color(d.id));
-        
-        addTooltip(svg, circles, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>Year: ${d.year}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
-        
-        // Create the lines
-        svg.append("g")      
-            .selectAll("line")
-            .data(groupedLineData)
-            .enter()
-            .append("path")
-            .attr("fill", "none")
-            .attr("stroke", d => color(d[0]))
-            .attr("stroke-width", 1.5)
-            .attr("d", d => {
-                return d3.line()
-                    .x(d => x(d.year) + 18)
-                    .y(d => y(+d.medals))
-                    (d[1])
-                });
-
-        // Legend
-        let legend = ["host", "non-host", "average"]
-        // Create the dots in the legend
-        const size = 20
-            svg.selectAll("legend")
-            .data(legend)
-            .join("circle")
-                .attr("cx", width - margin.right + 20)
-                .attr("cy", (d, i) => margin.top - 15 + i * (size + 5))
-                .attr("r", 7)
-                .style("fill", d => color(d))
-
-        // Create the labels in the legend
-        svg.selectAll("legend")
-            .data(legend)
-            .enter()
-            .append("text")
-                .attr("x", width - margin.right + 35)
-                .attr("y", (d, i) => margin.top - 10 + i * (size + 5))
-                .text(d => d)
-                .attr("font-weight", "bold")
-                .attr("text-anchor", "left")
-                .style("font-size", "12px")
-        
-        return svg.node();
-    }
-    hostPlot = makeHostPlot(hostData, 7);
+    // host plots
+    makeScatterPlot(hostData.find( c => c.year == "1920" ).data, "host", "1920", 7);
+    makeScatterPlot(hostData.find( c => c.year == "1960" ).data, "host", "1960", 8);
+    makeScatterPlot(hostData.find( c => c.year == "2000" ).data, "host", "2000", 9);
 
     // stream graph 
     function makeStreamGraph(data, i) {
@@ -530,7 +354,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
             .attr("font-size", "12px");
         });
       }
-    streamgraph = makeStreamGraph(rawOlympicData, 8);
+    makeStreamGraph(rawOlympicData, 10);
 
   })
   .catch(function(error) {
