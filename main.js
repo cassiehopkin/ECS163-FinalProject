@@ -151,7 +151,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
 
         // Create the svg
         const svg = d3.select(`#svg${i}`)
-                        .append("svg")
+                        .insert("svg", ".my-box")
                         .attr("viewBox", [0, 0, width, height])
 
 
