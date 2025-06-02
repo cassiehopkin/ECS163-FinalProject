@@ -293,7 +293,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           .attr("opacity", 0.1)
           .on("mouseover", function (event, d) {
             tooltip
-              .html(`<strong>${d.event}</strong><br>` +`Start: ${d.start}<br>` + `End: ${d.end}`)
+              .html(`<strong>${d.event}</strong><br>` + `${d.start} - ${d.end}`)
               .style("display", "block");
           })
           .on("mousemove", function (event) {
@@ -542,6 +542,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .on("end", brushended);
 
       const gb = svg.append("g").call(brush).call(brush.move, defaultView);
+
 
       // define brush behavior
       function brushed({ selection }) {
