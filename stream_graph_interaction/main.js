@@ -3,6 +3,7 @@ const csvs = [
   "GDP_Data_Year_1_To_2008_modified@2.csv",
   "Population_Data_Year_1_To_2008_modified@2.csv",
   "NOC_CODES_modified.csv",
+  "wiki_wars.csv",
 ];
 
 Promise.all(csvs.map((file) => d3.csv(file)))
@@ -10,7 +11,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
     // Global Assets /////////////////////////////////////////////////////////////////////////////////
     const rawNocData = dataArray[3];
     const nocToCountry = {};
-    rawNocData.forEach(d => {
+    rawNocData.forEach((d) => {
       nocToCountry[d.NOC] = d.Country;
     });
 
@@ -44,7 +45,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
     const rawOlympicData = dataArray[0];
     const rawGdpData = dataArray[1];
     const rawPopulationData = dataArray[2];
-    //const rawNocData = dataArray[3];
+    const rawConflictData = dataArray[4];
 
     // Process Data ///////////////////////////////////////////////////////////////////////////////////
     function processOlympicData() {
@@ -159,6 +160,29 @@ Promise.all(csvs.map((file) => d3.csv(file)))
 
     const gdpData = processGdpData();
 
+    function processConflictData() {
+      const importantConflicts = [
+        "World War II",
+        "World War I",
+        "Cold War",
+        "Soviet-Afghan War",
+        "Yugoslav Wars",
+      ];
+
+      const filteredData = rawConflictData.filter((d) =>
+        importantConflicts.includes(d.eventLabel)
+      );
+
+      let formattedData = filteredData.map((d) => ({
+        event: d.eventLabel,
+        start: new Date(d.startDate).getFullYear(),
+        end: new Date(d.endDate).getFullYear(),
+      }));
+      return formattedData;
+    }
+
+    const conflictData = processConflictData();
+
     function processHostData(year) {
       let hostData = [];
 
@@ -194,7 +218,6 @@ Promise.all(csvs.map((file) => d3.csv(file)))
 
     // Visualizations ////////////////////////////////////////////////////////////////////////////
 
-
     // Stream Graph /////////////////////////////////////////////////////////////////////////////
     function makeStreamGraph(data, i) {
       //Filtering Data for invalid rows
@@ -212,7 +235,6 @@ Promise.all(csvs.map((file) => d3.csv(file)))
 
       //const years = Array.from(new Set(filtered.map((d) => +d.Edition))).sort();
       const years = Array.from(new Set(filtered.map((d) => +d.Edition))).sort();
-
 
       // Reshaping Data for stream graph
       const streamData = years.map((year) => {
@@ -235,8 +257,14 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       const contextHeight = 130;
       const contextMarginTop = 35;
       const focusHeight = 250;
+      const whiteSpaceTop = 100;
       const margin = { top: 50, right: 200, bottom: 40, left: 60 };
-      const height = focusHeight + contextHeight + margin.top + margin.bottom;
+      const height =
+        focusHeight +
+        contextHeight +
+        margin.top +
+        margin.bottom +
+        whiteSpaceTop;
 
       //Create svg
       const svg = d3
@@ -244,6 +272,36 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .append("svg")
         .attr("viewBox", [0, 0, width, height])
         .style("display", "block");
+
+      const conflictSquare = svg
+        .append("g")
+        .attr("class", "conflict-squares")
+        .attr("clip-path", "url(#clip)");
+
+      function drawConflictOutline(xScale) {
+        const squares = conflictSquare
+          .selectAll("rect")
+          .data(conflictData, (d) => d.event);
+
+        squares
+          .join("rect")
+          .attr("x", (d) => xScale(d.start))
+          .attr("y", margin.top)
+          .attr("width", (d) => xScale(d.end) - xScale(d.start))
+          .attr("height", height - whiteSpaceTop - margin.bottom - focusHeight)
+          .attr("fill", "red")
+          .attr("opacity", 0.1);
+
+        conflictSquare
+          .selectAll("text")
+          .data(conflictData)
+          .join("text")
+          .attr("x", (d) => xScale(d.start) + 40)
+          .attr("y", margin.top + 40)
+          .text((d) => d.event)
+          .attr("font-size", "20px")
+          .attr("font-weight", "bold");
+      }
 
       //X scale (linear) Focus View
       const x = d3
@@ -264,7 +322,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           d3.min(series, (layer) => d3.min(layer, (d) => d[0])),
           d3.max(series, (layer) => d3.max(layer, (d) => d[1])),
         ])
-        .range([margin.top + focusHeight, margin.top]);
+        .range([whiteSpaceTop + focusHeight, whiteSpaceTop]);
 
       // Y Scale Context View
       const yContext = d3
@@ -274,8 +332,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           d3.max(series, (layer) => d3.max(layer, (d) => d[1])),
         ])
         .range([
-          margin.top + focusHeight + contextHeight,
-          margin.top + focusHeight + contextMarginTop,
+          whiteSpaceTop + focusHeight + contextHeight,
+          whiteSpaceTop + focusHeight + contextMarginTop,
         ]);
 
       //Color Scheme
@@ -311,11 +369,12 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       // Draw Focus layers
       const tooltip = d3.select("#tooltip");
 
-      const focusLine = svg.append("line")
+      const focusLine = svg
+        .append("line")
         .attr("stroke", "black")
         .attr("stroke-dasharray", "3,3")
-        .attr("y1", margin.top)
-        .attr("y2", margin.top + focusHeight)
+        .attr("y1", whiteSpaceTop)
+        .attr("y2", whiteSpaceTop + focusHeight)
         .style("display", "none");
 
       svg
@@ -335,7 +394,10 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           const [mouseX] = d3.pointer(event);
           // const hoveredYear = Math.round(x.invert(mouseX));
           const hoveredYear = years.reduce((prev, curr) =>
-            Math.abs(x.invert(mouseX) - curr) < Math.abs(x.invert(mouseX) - prev) ? curr : prev
+            Math.abs(x.invert(mouseX) - curr) <
+            Math.abs(x.invert(mouseX) - prev)
+              ? curr
+              : prev
           );
 
           const focusX = x(hoveredYear);
@@ -345,33 +407,36 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           const countryName = nocToCountry[noc] || noc;
 
           const yearData = rawOlympicData.filter(
-            o => +o.Edition === hoveredYear && o.NOC === noc && o.Medal !== "NA"
+            (o) =>
+              +o.Edition === hoveredYear && o.NOC === noc && o.Medal !== "NA"
           );
 
           if (yearData.length > 0) {
-            const gold = yearData.filter(r => r.Medal === "Gold").length;
-            const silver = yearData.filter(r => r.Medal === "Silver").length;
-            const bronze = yearData.filter(r => r.Medal === "Bronze").length;
+            const gold = yearData.filter((r) => r.Medal === "Gold").length;
+            const silver = yearData.filter((r) => r.Medal === "Silver").length;
+            const bronze = yearData.filter((r) => r.Medal === "Bronze").length;
             const total = gold + silver + bronze;
 
             tooltip
               .html(
                 `<strong>${countryName}</strong><br>` +
-                `Year: ${hoveredYear}<br>` +
-                `Total Medals: ${total}<br>` +
-                `Gold: ${gold}<br>` +
-                `Silver: ${silver}<br>` +
-                `Bronze: ${bronze}`
+                  `Year: ${hoveredYear}<br>` +
+                  `Total Medals: ${total}<br>` +
+                  `Gold: ${gold}<br>` +
+                  `Silver: ${silver}<br>` +
+                  `Bronze: ${bronze}`
               )
               .style("left", event.pageX + 15 + "px")
               .style("top", event.pageY - 28 + "px");
           } else {
             // No data — find nearest years with data
-            const allYearsWithMedals = [...new Set(
-              rawOlympicData
-                .filter(o => o.NOC === noc && o.Medal !== "NA")
-                .map(o => +o.Edition)
-            )].sort((a, b) => a - b);
+            const allYearsWithMedals = [
+              ...new Set(
+                rawOlympicData
+                  .filter((o) => o.NOC === noc && o.Medal !== "NA")
+                  .map((o) => +o.Edition)
+              ),
+            ].sort((a, b) => a - b);
 
             let lower = null;
             let higher = null;
@@ -391,30 +456,28 @@ Promise.all(csvs.map((file) => d3.csv(file)))
             tooltip
               .html(
                 `<strong>${countryName}</strong><br>` +
-                `Year: ${hoveredYear}<br>` +
-                `${suggestion}`
+                  `Year: ${hoveredYear}<br>` +
+                  `${suggestion}`
               )
               .style("left", event.pageX + 15 + "px")
               .style("top", event.pageY - 28 + "px");
           }
         })
-        .on("mouseleave", function () {   // mouseleave also works for d3 to reduce tracking
+        .on("mouseleave", function () {
+          // mouseleave also works for d3 to reduce tracking
           tooltip.style("display", "none");
           focusLine.style("display", "none");
           d3.select(this).attr("stroke", null).attr("stroke-width", null);
         });
 
-
-
+      drawConflictOutline(x);
 
       //Create x axis with labels
       const xFocusAxis = svg
         .append("g")
-        .attr("transform", `translate(0,${margin.top + focusHeight})`)
+        .attr("transform", `translate(0,${whiteSpaceTop + focusHeight})`)
         //.call(d3.axisBottom(x).tickFormat(d3.format("d")))
-        .call(d3.axisBottom(x)
-          .tickValues(years)
-          .tickFormat(d3.format("d")))
+        .call(d3.axisBottom(x).tickValues(years).tickFormat(d3.format("d")))
 
         .attr("font-weight", "bold")
         .style("font-size", "15px");
@@ -423,9 +486,11 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       svg
         .append("g")
         .attr("transform", `translate(${margin.left},0)`)
-        .call(d3.axisLeft(y).tickFormat("").tickSize(0))
+        .call(d3.axisLeft(y))
         .select(".domain")
-        .attr("stroke", "black");
+        .attr("stroke", "black")
+        .attr("font-weight", "bold");
+
 
       // Draw Context Layers
       svg
@@ -442,7 +507,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .append("g")
         .attr(
           "transform",
-          `translate(0,${margin.top + focusHeight + contextHeight})`
+          `translate(0,${whiteSpaceTop + focusHeight + contextHeight})`
         )
         .call(d3.axisBottom(xContext).tickFormat(d3.format("d")))
         .attr("font-weight", "bold")
@@ -455,8 +520,11 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       const brush = d3
         .brushX()
         .extent([
-          [margin.left, margin.top + focusHeight + contextMarginTop],
-          [width - margin.right, margin.top + focusHeight + contextHeight - 1],
+          [margin.left, whiteSpaceTop + focusHeight + contextMarginTop],
+          [
+            width - margin.right,
+            whiteSpaceTop + focusHeight + contextHeight - 1,
+          ],
         ])
         .on("brush", brushed)
         .on("end", brushended);
@@ -471,6 +539,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
 
           svg.selectAll(".area.focus").attr("d", area);
           xFocusAxis.call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+          drawConflictOutline(x);
         }
       }
 
