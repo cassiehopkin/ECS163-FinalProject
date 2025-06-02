@@ -49,21 +49,22 @@
 
       <!-- <svg id="populationScatter" width="100%" height="auto" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet"></svg> -->
 
-      <div id = "svg10" class="mySlides w3-container w3-center" style="width:100%;">
-        <div id = "left">
-        <svg id = "populationScatter"></svg>
-        <svg id = "gdpScatter"></svg>
+      <div id = "svg10" class="mySlides w3-container w3-center" style="width: 100%; position: relative;">
+        <div style="zoom: 1.5;">
+          <div id = "left">
+          <svg id = "populationScatter"></svg>
+          <svg id = "gdpScatter"></svg>
+          </div>
+          <div id = "middle">
+            <svg id = "hostScatter"></svg>
+            <svg id= "heatmap"></svg>
+          </div>
         </div>
-        <div id = "middle">
-          <svg id = "hostScatter"></svg>
-          <svg id= "heatmap"></svg>
-        </div>
-
-        <div id = "right">
-          <!--https://www.w3schools.com/tags/tag_select.asp-->
-          <label for="years">Choose a year:</label>
-          <select name="year" id="years"></select>
-        </div>
+          <div id = "right">
+            <!--https://www.w3schools.com/tags/tag_select.asp-->
+            <label for="years">Choose a year:</label>
+            <select name="year" id="years"></select>
+          </div>
       </div>
       <!-- slide 11 -->
       <div id = "svg11" class="mySlides w3-container">
