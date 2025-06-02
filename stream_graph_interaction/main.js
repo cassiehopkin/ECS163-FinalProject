@@ -290,7 +290,20 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           .attr("width", (d) => xScale(d.end) - xScale(d.start))
           .attr("height", height - whiteSpaceTop - margin.bottom - focusHeight)
           .attr("fill", "red")
-          .attr("opacity", 0.1);
+          .attr("opacity", 0.1)
+          .on("mouseover", function (event, d) {
+            tooltip
+              .html(`<strong>${d.event}</strong><br>` +`Start: ${d.start}<br>` + `End: ${d.end}`)
+              .style("display", "block");
+          })
+          .on("mousemove", function (event) {
+            tooltip
+              .style("left", event.pageX + 15 + "px")
+              .style("top", event.pageY - 28 + "px");
+          })
+          .on("mouseleave", function () {
+            tooltip.style("display", "none");
+          });
 
         conflictSquare
           .selectAll("text")
@@ -491,7 +504,6 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("stroke", "black")
         .attr("font-weight", "bold");
 
-
       // Draw Context Layers
       svg
         .append("g")
@@ -582,9 +594,10 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           .append("text")
           .attr("x", 16)
           .attr("y", 10)
-          .text(key)
+          .text(nocToCountry[key] || key)
           .attr("alignment-baseline", "middle")
-          .attr("font-size", "12px");
+          .attr("font-weight", "bold")
+          .attr("font-size", "15px");
       });
     }
     const streamgraph = makeStreamGraph(rawOlympicData, 8);
