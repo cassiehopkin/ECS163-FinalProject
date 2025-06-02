@@ -17,7 +17,7 @@
   </style>
 
   <body>
-    <div class="w3-content w3-display-container" style="width:100%">
+    <div class="w3-content w3-display-container" style="width:100%;height: max-content;">
       <!-- slide 1 -->
       <div id = "svg1" class="mySlides w3-container">
       </div>
@@ -45,8 +45,28 @@
       <!-- slide 9 -->
       <div id = "svg9" class="mySlides w3-container">
       </div>
-      <!-- slide 10 -->
-      <div id = "svg10" class="mySlides w3-container">
+      <!-- dashboard slide 10 -->
+
+      <!-- <svg id="populationScatter" width="100%" height="auto" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet"></svg> -->
+
+      <div id = "svg10" class="mySlides w3-container w3-center" style="width:100%;">
+        <div id = "left">
+        <svg id = "populationScatter"></svg>
+        <svg id = "gdpScatter"></svg>
+        </div>
+        <div id = "middle">
+          <svg id = "hostScatter"></svg>
+          <svg id= "heatmap"></svg>
+        </div>
+
+        <div id = "right">
+          <!--https://www.w3schools.com/tags/tag_select.asp-->
+          <label for="years">Choose a year:</label>
+          <select name="year" id="years"></select>
+        </div>
+      </div>
+      <!-- slide 11 -->
+      <div id = "svg11" class="mySlides w3-container">
       </div>
 
 
@@ -66,11 +86,14 @@
         <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(8)"></span>
         <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(9)"></span>
         <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(10)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(11)"></span>
       </div>
     </div>
 
     <script src="https://d3js.org/d3.v6.min.js"></script>
 	  <script src="main.js"></script>
+    <script src="https://unpkg.com/simple-statistics@7.7.4/dist/simple-statistics.min.js"></script>
+    <script src="dashboard/main.js"></script>
 
     <!-- logic for how to navigate between slides -->
     <script>

@@ -144,10 +144,13 @@ Promise.all(csvs.map(file => d3.csv(file)))
     }
     function makeScatterPlot(data, factor, year, i){
 
-        // measurements
-        const margin = ({top: 100, right: 50, bottom: 50, left: 50});
-        const height = 450;
-        const width = 1300;
+        // // measurements
+        // const margin = ({top: 100, right: 50, bottom: 50, left: 50});
+        // const height = 450;
+        // const width = 1300;
+        const width = 1200;
+        const height = 500;
+        const margin = { top: 80, right: 100, bottom: 40, left: 100 };
 
         // Create the svg
         const svg = d3.select(`#svg${i}`)
@@ -270,7 +273,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
         //Dimensions
         const width = 1200;
         const height = 500;
-        const margin = { top: 50, right: 200, bottom: 40, left: 60 };
+        const margin = { top: 80, right: 100, bottom: 40, left: 100 };
 
         //Create svg
         const svg = d3.select(`#svg${i}`)
@@ -327,8 +330,9 @@ Promise.all(csvs.map(file => d3.csv(file)))
           
         //Title
         svg.append("text")
-          .attr("x", width / 6)
-          .attr("y", margin.top - 10)
+          .attr("text-anchor", "middle")
+          .attr("x", (margin.left + width - margin.right) / 2)
+          .attr("y", margin.top / 2)
           .attr("font-weight", "bold")
           .style("font-size", "25px")
           .text("Olympic Medals by Country (Top 10 Stream Graph)");
@@ -354,7 +358,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
             .attr("font-size", "12px");
         });
       }
-    makeStreamGraph(rawOlympicData, 10);
+    makeStreamGraph(rawOlympicData, 11);
 
   })
   .catch(function(error) {
