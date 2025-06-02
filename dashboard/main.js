@@ -424,9 +424,9 @@ Promise.all(csvs.map(file => d3.csv(file)))
           hostGy.transition().delay(50).duration(750).call(hostYAxis);
 
           renderDots();
-          addTooltip(populationSvg, populationSvg.selectAll("circle"), d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"population"}: ${formatPopulation(d.population)}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
-          addTooltip(gdpSvg, gdpSvg.selectAll("circle"), d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"gdp"}: ${d.gdp}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
-          addTooltip(hostSvg, hostSvg.selectAll("circle"), d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"host"}: ${d.host}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
+          addTooltip(populationSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"population"}: ${formatPopulation(d.population)}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
+          addTooltip(gdpSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"gdp"}: ${d.gdp}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
+          addTooltip(hostSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"host"}: ${d.host}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
 
           // Update heatmap
           userYear = dropDownList.value;
