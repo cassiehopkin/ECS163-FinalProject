@@ -4,6 +4,11 @@ Promise.all(csvs.map(file => d3.csv(file)))
   .then(function(dataArray) {
     // Global Assets /////////////////////////////////////////////////////////////////////////////////
 
+      // Scatter plot measurements
+      const scatterMargin = ({top: 100, right: 50, bottom: 50, left: 50});
+      const scatterHeight = 450;
+      const scatterWidth = 800;
+
     // Parse Data //////////////////////////////////////////////////////////////////////////////////////
     const rawOlympicData = dataArray[0]
     const rawGdpData = dataArray[1]
@@ -134,19 +139,14 @@ Promise.all(csvs.map(file => d3.csv(file)))
           newOption.value = year;
           dropDownList.appendChild(newOption);
       })
+      let userYear = dropDownList.value;
 
-      // Scatter plot measurements
-      const scatterMargin = ({top: 100, right: 50, bottom: 50, left: 50});
-      const scatterHeight = 450;
-      const scatterWidth = 800;
-
-      // Scatter plots
-      let year = dropDownList.value;
+      // Scatter Plots ////////////////////////////////////////////////////////////////////////////
 
       // Set Data
-      let scatterPopulationData = populationData.find( c => c.year == year ).data;
-      let scatterGdpData = gdpData.find( c => c.year == year ).data;
-      let scatterHostData = hostData.find( c => c.year == year ).data.sort(function(x, y){return d3.ascending(x.host, y.host);});
+      let scatterPopulationData = populationData.find( c => c.year == userYear ).data;
+      let scatterGdpData = gdpData.find( c => c.year == userYear ).data;
+      let scatterHostData = hostData.find( c => c.year == userYear ).data.sort(function(x, y){return d3.ascending(x.host, y.host);});
 
       // Svgs
       const populationSvg = d3.select("#populationScatter").append("svg").attr("viewBox", [0, 0, scatterWidth, scatterHeight]);
@@ -217,37 +217,37 @@ Promise.all(csvs.map(file => d3.csv(file)))
 
           populationSvg.selectAll("circle").data(scatterPopulationData).join(
               enter => enter.append("circle").attr("r", 5).style("fill", "black").attr("cy", d => populationY(d.medals)).attr("cx", d => populationX(d.population))
-                  .attr("opacity", 0).call(enter => enter.transition(populationT).attr("opacity", 1)),
+                                     .attr("opacity", 0).call(enter => enter.transition(populationT).attr("opacity", 1)),
               update => update.call(update => update.transition(populationT).attr("cy", d => populationY(d.medals)).attr("cx", d => populationX(d.population))),
               exit => exit.call(exit => exit.transition(populationT).attr("opacity", 0)).remove()
           )
 
           gdpSvg.selectAll("circle").data(scatterGdpData).join(
               enter => enter.append("circle").attr("r", 5).style("fill", "black").attr("cy", d => gdpY(d.medals)).attr("cx", d => gdpX(d.gdp))
-                  .attr("opacity", 0).call(enter => enter.transition(gdpT).attr("opacity", 1)),
+                                     .attr("opacity", 0).call(enter => enter.transition(gdpT).attr("opacity", 1)),
               update => update.call(update => update.transition(gdpT).attr("cy", d => gdpY(d.medals)).attr("cx", d => gdpX(d.gdp))),
               exit => exit.call(exit => exit.transition(gdpT)).attr("opacity", 0).remove()
           )
 
           hostSvg.selectAll("circle").data(scatterHostData).join(
               enter => enter.append("circle").attr("r", 5).style("fill", "black").attr("cy", d => hostY(d.medals)).attr("cx", d => hostX(d.host) + hostX.bandwidth()/2)
-                  .attr("opacity", 0).call(enter => enter.transition(hostT).attr("opacity", 1)),
+                                     .attr("opacity", 0).call(enter => enter.transition(hostT).attr("opacity", 1)),
               update => update.call(update => update.transition(hostT).attr("cy", d => hostY(d.medals)).attr("cx", d => hostX(d.host) + hostX.bandwidth()/2)),
               exit => exit.call(exit => exit.transition(hostT).attr("opacity", 0)).remove()
           )
       }
       renderDots();
 
-      // Tooltips
-      function addTooltip(svg, formatter) {
-          const tooltip = d3.select("body").append("div")
-              .style("position", "absolute")
-              .style("background", "#fff")
-              .style("border", "1px solid #ccc")
-              .style("padding", "5px")
-              .style("pointer-events", "none")
-              .style("opacity", 0);
-
+      // Tooltips ////////////////////////////////////////////////////////////////////////////
+      const tooltip = d3.select("body").append("div")
+          .style("position", "absolute")
+          .style("background", "#fff")
+          .style("border", "1px solid #ccc")
+          .style("padding", "5px")
+          .style("pointer-events", "none")
+          .style("opacity", 0);
+      function addTooltip(svg, formatter)
+      {
           svg.selectAll("circle").on("mouseover", function(event, d) {
               tooltip.transition().duration(200).style("opacity", 0.9);
               tooltip.html(formatter(d))
@@ -260,8 +260,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
       addTooltip(gdpSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"gdp"}: ${d.gdp}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
       addTooltip(hostSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"host"}: ${d.host}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
 
-    // heatmap
-      let userYear = dropDownList.value;
+      // Heatmap ////////////////////////////////////////////////////////////////////////////
       const variables = ["Medals", "GDP", "Population", "Host"];
 
       function generatePearsonData(){
@@ -400,14 +399,16 @@ Promise.all(csvs.map(file => d3.csv(file)))
       }
       renderBlocks();
 
+      // Dropdown Menu ////////////////////////////////////////////////////////////////////////////
       const dropdown = d3.select("#years");
       dropdown.on("change", function()
       {
+          userYear = dropDownList.value;
+
           // Update scatter plots
-          year = dropDownList.value;
-          scatterPopulationData = populationData.find( c => c.year == year ).data;
-          scatterGdpData = gdpData.find( c => c.year == year ).data;
-          scatterHostData = hostData.find( c => c.year == year ).data.sort(function(x, y){return d3.ascending(x.host, y.host);});
+          scatterPopulationData = populationData.find( c => c.year == userYear ).data;
+          scatterGdpData = gdpData.find( c => c.year == userYear ).data;
+          scatterHostData = hostData.find( c => c.year == userYear ).data.sort(function(x, y){return d3.ascending(x.host, y.host);});
 
           populationX.domain([d3.min(scatterPopulationData, d => d.population), d3.max(scatterPopulationData, d => d.population)]);
           gdpX.domain([d3.min(scatterGdpData, d => d.gdp), d3.max(scatterGdpData, d => d.gdp)]);
@@ -429,7 +430,6 @@ Promise.all(csvs.map(file => d3.csv(file)))
           addTooltip(hostSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"host"}: ${d.host}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
 
           // Update heatmap
-          userYear = dropDownList.value;
           pearsonData = generatePearsonData();
           renderBlocks();
       })
