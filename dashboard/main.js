@@ -239,7 +239,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
       renderDots();
 
       // Tooltips
-      function addTooltip(svg, data, formatter) {
+      function addTooltip(svg, formatter) {
           const tooltip = d3.select("body").append("div")
               .style("position", "absolute")
               .style("background", "#fff")
@@ -256,9 +256,9 @@ Promise.all(csvs.map(file => d3.csv(file)))
           })
               .on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
       }
-      addTooltip(populationSvg, scatterPopulationData, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"population"}: ${formatPopulation(d.population)}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
-      addTooltip(gdpSvg, scatterGdpData, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"gdp"}: ${d.gdp}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
-      addTooltip(hostSvg, scatterHostData, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"host"}: ${d.host}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
+      addTooltip(populationSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"population"}: ${formatPopulation(d.population)}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
+      addTooltip(gdpSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"gdp"}: ${d.gdp}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
+      addTooltip(hostSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"host"}: ${d.host}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
 
     // heatmap
       let userYear = dropDownList.value;
