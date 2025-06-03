@@ -1,4 +1,4 @@
-const csvs = ["ALL_MEDALISTS_modified.csv", "GDP_Data_Year_1_To_2008_modified.csv", "Population_Data_Year_1_To_2008_modified.csv", "NOC_CODES_modified.csv"];
+// const csvs = ["ALL_MEDALISTS_modified.csv", "GDP_Data_Year_1_To_2008_modified.csv", "Population_Data_Year_1_To_2008_modified.csv", "NOC_CODES_modified.csv"];
 
 Promise.all(csvs.map(file => d3.csv(file)))
   .then(function(dataArray) {

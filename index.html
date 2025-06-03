@@ -5,23 +5,21 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-colors-2024.css">
 	  <title>Contextualizing Olympic Success</title>
   </head>
 
   <style>
-    .mySlides {display:none}
+    .mySlides {display:none; height: 80vh;}
     .w3-display-left, .w3-display-right, .w3-badge {cursor:pointer}
     .w3-badge {height:13px;width:13px;padding:0}
     .w3-display-left {color:black}
     .w3-display-right {color:black}
-  </style>
-
-  <style>
     .my-box {
       width: 90%;
       margin: 0 auto;
       border: 1px solid black;
-      background-color: rgb(192, 211, 241);
+      background-color: #d6def0;
       padding: 10px;
       border-radius: 8px;
       font-family: 'Times New Roman', sans-serif;
@@ -29,9 +27,6 @@
       color: #333;
       text-align: center;
     }
-  </style>
-
-  <style>
     .my-title {
       font-family: 'Times New Roman', sans-serif;
       font-size: 50px;
@@ -42,7 +37,7 @@
 
 
   <body>
-    <div class="w3-content w3-display-container" style="width:100%;height: max-content;">
+    <div class="w3-content w3-display-container" style="width:100%;">
       <!-- title slide -->
       <div id = "title-slide" class="mySlides w3-container w3-center" style="width: 80vw; height: 80vh; align-content: center;">
         <div class="my-title">
@@ -130,7 +125,7 @@
       <!-- dashboard slide 10 -->
 
       <div id = "svg10" class="mySlides w3-container w3-center" style="width: 100%; position: relative;">
-        <div style="zoom: 1.5;">
+        <div style="zoom: 1.3;">
           <div id = "left">
           <svg id = "populationScatter"></svg>
           <svg id = "gdpScatter"></svg>
@@ -160,6 +155,15 @@
           </p>
         </div>
       </div>
+      <!-- slide 12 -->
+      <div id = "svg12" class="mySlides w3-container">
+        <div class="my-box w3-center">
+          <p>
+            <b>Zoom into any moment in Olympic history.</b>
+            This version overlays key global events so you can see how international context shapes who wins and who doesn’t, connecting sport to history.
+          </p>
+        </div>
+      </div>
 
       <!-- conclusion slide -->
       <div id = "conclusion-slide" class="mySlides w3-container w3-center" style="width: 80vw; height: 80vh; align-content: center;">
@@ -175,31 +179,33 @@
 
 
       <!-- navigation stuff -->
-      <div class="w3-center w3-container w3-section w3-large w3-text-white" style="width:100%">
+      <div class="w3-center w3-container w3-section w3-large w3-text-white" style="width:100%;">
         <!-- side arrow buttons -->
         <div class="w3-display-left w3-hover-text-khaki" onclick="plusDivs(-1)">&#10094;</div>
         <div class="w3-display-right w3-hover-text-khaki" onclick="plusDivs(1)">&#10095;</div>
         <!-- bottom circles -->
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(1)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(2)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(3)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(4)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(5)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(6)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(7)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(8)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(9)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(10)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(11)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(12)"></span>
-        <span class="w3-badge demo w3-border w3-transparent w3-hover-white w3-display-bottom" onclick="currentDiv(13)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(1)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(2)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(3)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(4)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(5)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(6)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(7)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(8)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(9)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(10)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(11)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(12)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(13)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(14)"></span>
       </div>
     </div>
 
     <script src="https://d3js.org/d3.v6.min.js"></script>
 	  <script src="main.js"></script>
     <script src="https://unpkg.com/simple-statistics@7.7.4/dist/simple-statistics.min.js"></script>
-    <script src="dashboard/main.js"></script>
+    <script src="dashboard_main.js"></script>
+    <script src="stream_main.js"></script>
 
     <!-- logic for how to navigate between slides -->
     <script>
@@ -224,10 +230,10 @@
           x[i].style.display = "none";  
         }
         for (i = 0; i < dots.length; i++) {
-          dots[i].className = dots[i].className.replace(" w3-blue", "");
+          dots[i].className = dots[i].className.replace(" w3-2024-chambray-blue", "");
         }
         x[slideIndex-1].style.display = "block";  
-        dots[slideIndex-1].className += " w3-blue";
+        dots[slideIndex-1].className += " w3-2024-chambray-blue";
       }
     </script>
   </body>
