@@ -149,12 +149,42 @@
         </div>
       </div>
       <!-- slide 11 -->
-      <div id = "svg11" class="mySlides w3-container">
+      <div id="svg11" class="mySlides w3-container">
         <div class="my-box w3-center">
           <p>
-            This sweeping view shows the <b>rise and fall of Olympic powers over time.</b> Peaks and valleys in the steam graph tells stories of political change, national focus, and shifting priorities on a global stage.
+            This sweeping view shows the <b>rise and fall of Olympic powers over time.</b> Peaks and valleys in the stream graph tell stories of political change, national focus, and shifting priorities on a global stage.
           </p>
         </div>
+         <div id="checkboxFilterBox" style="
+         width: 90%;
+         margin: 0 auto;
+         margin-top: 15px;
+         padding: 10px;
+         background-color: #fff;
+         border: 1px solid #ccc;
+         border-radius: 8px;
+         max-height: 200px;
+         overflow-y: auto;
+         font-size: 16px;
+         text-align: left;
+       ">
+         <label><b>Filter Countries:</b></label>
+         <div id="checkboxContainer" style="
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            max-height: 150px;
+            overflow-y: auto;
+            gap: 5px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+          "></div>
+          <div style="margin-top: 15px;">
+            <button id="selectAllBtn" style="margin-right: 10px;">Select All</button>
+            <button id="clearAllBtn">Clear All</button>
+          </div>
+       </div>
       </div>
       <!-- slide 12 -->
       <div id = "svg12" class="mySlides w3-container">
