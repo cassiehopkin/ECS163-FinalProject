@@ -1,11 +1,3 @@
-// const csvs = [
-//   "ALL_MEDALISTS_modified@3.csv",
-//   "GDP_Data_Year_1_To_2008_modified@2.csv",
-//   "Population_Data_Year_1_To_2008_modified@2.csv",
-//   "NOC_CODES_modified.csv",
-//   "wiki_wars.csv",
-// ];
-
 Promise.all(csvs.map((file) => d3.csv(file)))
   .then(function (dataArray) {
     // Global Assets /////////////////////////////////////////////////////////////////////////////////
@@ -15,151 +7,12 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       nocToCountry[d.NOC] = d.Country;
     });
 
-    // The years we wish to make visualizations for
-    const years = ["1920", "1960", "2000"];
-
-    // Colors of the points in the scatter plots
-    const colors = [
-      { id: "normal", color: "#000000" },
-      { id: "host", color: "#4287f5" },
-      { id: "non-host", color: "#DEDEDE" },
-      { id: "average", color: "#000000" },
-    ];
-
-    function color(id) {
-      return colors.find((d) => d.id == id).color;
-    }
-
-    // Order of the dot types in the host scatter plot
-    const placementHierarchy = [
-      { id: "host", placement: 2 },
-      { id: "non-host", placement: 0 },
-      { id: "average", placement: 1 },
-    ];
-
-    function placement(id) {
-      return placementHierarchy.find((d) => d.id == id).placement;
-    }
 
     // Parse Data //////////////////////////////////////////////////////////////////////////////////////
     const rawOlympicData = dataArray[0];
-    const rawGdpData = dataArray[1];
-    const rawPopulationData = dataArray[2];
     const rawConflictData = dataArray[4];
 
     // Process Data ///////////////////////////////////////////////////////////////////////////////////
-    function processOlympicData() {
-      let formattedData = [];
-      const allYears = {};
-
-      rawOlympicData.forEach((d) => {
-        if (!(d["Edition"] in allYears)) {
-          const newYear = {
-            year: d["Edition"],
-            host: d["HostNOC"],
-            countryMedals: {},
-          };
-          allYears[d["Edition"]] = newYear;
-        }
-        if (d["NOC"] in allYears[d["Edition"]].countryMedals) {
-          allYears[d["Edition"]].countryMedals[d["NOC"]].medals =
-            allYears[d["Edition"]].countryMedals[d["NOC"]].medals + 1;
-        } else if (
-          Object.values(d) != null &&
-          rawNocData.some((c) => c["NOC"] == d["NOC"])
-        ) {
-          const newCountryMedal = {
-            NOC: d["NOC"],
-            medals: 1,
-          };
-          allYears[d["Edition"]].countryMedals[d["NOC"]] = newCountryMedal;
-        }
-      });
-
-      Object.keys(allYears).forEach((d) => {
-        formattedData.push(allYears[d]);
-      });
-
-      return formattedData;
-    }
-
-    const olympicData = processOlympicData();
-
-    function processPopulationData() {
-      let populationData = [];
-
-      years.forEach((year) => {
-        let data = [];
-        let countryMedals = olympicData.find(
-          (c) => c.year == year
-        ).countryMedals;
-
-        rawPopulationData.forEach((d) => {
-          if (d.NOC in countryMedals) {
-            let population = d[year];
-            let medals = countryMedals[d.NOC].medals;
-
-            if (population && medals) {
-              const dataPoint = {
-                NOC: d.NOC,
-                population: Number(population),
-                medals: medals,
-                id: "normal",
-              };
-              data.push(dataPoint);
-            }
-          }
-        });
-
-        const dataPoint = {
-          year: year,
-          data: data,
-        };
-        populationData.push(dataPoint);
-      });
-
-      return populationData;
-    }
-    const populationData = processPopulationData();
-
-    function processGdpData() {
-      let gdpData = [];
-
-      years.forEach((year) => {
-        let data = [];
-        let countryMedals = olympicData.find(
-          (c) => c.year == year
-        ).countryMedals;
-
-        rawGdpData.forEach((d) => {
-          if (d.NOC in countryMedals) {
-            let gdp = d[year];
-            let medals = countryMedals[d.NOC].medals;
-
-            if (gdp && medals) {
-              const dataPoint = {
-                NOC: d.NOC,
-                gdp: Number(gdp),
-                medals: medals,
-                id: "normal",
-              };
-              data.push(dataPoint);
-            }
-          }
-        });
-
-        const dataPoint = {
-          year: year,
-          data: data,
-        };
-        gdpData.push(dataPoint);
-      });
-
-      return gdpData;
-    }
-
-    const gdpData = processGdpData();
-
     function processConflictData() {
       const importantConflicts = [
         "World War II",
@@ -183,38 +36,6 @@ Promise.all(csvs.map((file) => d3.csv(file)))
 
     const conflictData = processConflictData();
 
-    function processHostData(year) {
-      let hostData = [];
-
-      olympicData.forEach((d) => {
-        let medal_sum = 0;
-
-        Object.keys(d.countryMedals).forEach((c) => {
-          let id = d.countryMedals[c].NOC == d.host ? "host" : "non-host";
-          medal_sum =
-            d.countryMedals[c].NOC == d.host
-              ? medal_sum
-              : medal_sum + d.countryMedals[c].medals;
-
-          const dataPoint = {
-            NOC: d.countryMedals[c].NOC,
-            year: d.year,
-            medals: d.countryMedals[c].medals,
-            id: id,
-          };
-          hostData.push(dataPoint);
-        });
-        const dataPoint = {
-          NOC: "average",
-          year: d.year,
-          medals: medal_sum / (Object.keys(d.countryMedals).length - 1),
-          id: "average",
-        };
-        hostData.push(dataPoint);
-      });
-      return hostData;
-    }
-    const hostData = processHostData();
 
     // Visualizations ////////////////////////////////////////////////////////////////////////////
 
@@ -258,7 +79,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       const contextMarginTop = 35;
       const focusHeight = 250;
       const whiteSpaceTop = 100;
-      const margin = { top: 50, right: 200, bottom: 40, left: 60 };
+      const margin = { top: 50, right: 200, bottom: 10, left: 60 };
       const height =
         focusHeight +
         contextHeight +
@@ -601,7 +422,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           .attr("font-size", "15px");
       });
     }
-    const streamgraph = makeStreamGraph(rawOlympicData, 12);
+    makeStreamGraph(rawOlympicData, 12);
   })
   .catch(function (error) {
     console.error("Error:", error);
