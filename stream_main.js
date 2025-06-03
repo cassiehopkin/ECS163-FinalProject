@@ -471,7 +471,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           .attr("font-size", "15px");
       });
     }
-    makeStreamGraph(rawOlympicData, 12);
+    makeStreamGraph(rawOlympicData, 13);
   })
   .catch(function (error) {
     console.error("Error:", error);

@@ -150,25 +150,31 @@
       </div>
       <!-- slide 11 -->
       <div id="svg11" class="mySlides w3-container">
+        <div class="after-svg">
         <div class="my-box w3-center">
           <p>
-            This sweeping view shows the <b>rise and fall of Olympic powers over time.</b> Peaks and valleys in the stream graph tell stories of political change, national focus, and shifting priorities on a global stage.
+            This sweeping view shows the <b>rise and fall of Olympic powers over time.</b> Peaks and valleys in the stream graph tell stories of political change, national focus, and shifting priorities on a global stage. On the next slide, explore how different countries performed over time by filtering the stream graph.
           </p>
         </div>
+        </div>
+      </div>
+      <!-- slide 12, stream graph with filtering -->
+      <div id="svg12" class="mySlides w3-container">
+        <div class = "after-svg">
          <div id="checkboxFilterBox" style="
-         width: 90%;
-         margin: 0 auto;
-         margin-top: 15px;
-         padding: 10px;
-         background-color: #fff;
-         border: 1px solid #ccc;
-         border-radius: 8px;
-         max-height: 200px;
-         overflow-y: auto;
-         font-size: 16px;
-         text-align: left;
-       ">
-         <label><b>Filter Countries:</b></label>
+          width: 90%;
+          margin: 0 auto;
+          margin-top: 15px;
+          padding: 10px;
+          background-color: #fff;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          max-height: 200px;
+          overflow-y: auto;
+          font-size: 14px;
+          text-align: left;
+        ">
+         <!-- <label><b>Filter Countries:</b></label> -->
          <div id="checkboxContainer" style="
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -181,13 +187,14 @@
             padding: 10px;
           "></div>
           <div style="margin-top: 10px;">
-            <button id="selectAllBtn" style="margin-right: 10px;">Select All</button>
-            <button id="clearAllBtn">Clear All</button>
+            <button id="selectAllBtn" style="margin-right: 10px;width: 80px;height: 25px;font-size: 12px;padding: 1px">Select All</button>
+            <button id="clearAllBtn" style="margin-right: 10px;width: 80px;height: 25px;font-size: 12px;padding: 1px">Clear All</button>
           </div>
        </div>
+       </div>
       </div>
-      <!-- slide 12 -->
-      <div id = "svg12" class="mySlides w3-container">
+      <!-- slide 13 -->
+      <div id = "svg13" class="mySlides w3-container">
         <div class="my-box w3-center">
           <p>
             <b>Zoom into any moment in Olympic history.</b>
@@ -240,6 +247,7 @@
         <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(12)"></span>
         <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(13)"></span>
         <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(14)"></span>
+        <span class="w3-badge demo w3-border w3-transparent w3-display-bottom" style="margin-top: 20px;" onclick="currentDiv(15)"></span>
       </div>
     </div>
 

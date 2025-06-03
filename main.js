@@ -391,7 +391,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       //Create svg
       const svg = d3
         .select(`#svg${i}`)
-        .insert("svg", ".my-box")
+        .insert("svg", ".after-svg")
         .attr("viewBox", [0, 0, width, height]);
 
       //X scale (linear)
@@ -536,7 +536,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
     
       const svg = d3
         .select(`#svg${i}`)
-        .insert("svg", ".my-box")
+        .insert("svg", ".my-checkbox")
         .attr("viewBox", [0, 0, width, height]);
     
       const x = d3.scaleLinear().domain([1896, 2020]).range([margin.left, width - margin.right]);
@@ -587,10 +587,11 @@ Promise.all(csvs.map((file) => d3.csv(file)))
     }
     
 
-    function updateStreamGraph(selectedNOCs, containerId = "svg11") {
+    function updateStreamGraph(selectedNOCs, i) {
+      containerId = `svg${i}`
       d3.select(`#${containerId} svg`).remove();  // Remove old graph
       const filteredData = rawOlympicData.filter(d => selectedNOCs.includes(d.NOC));
-      makeStreamGraph(filteredData, 11); // Re-render into svg11
+      makeStreamGraph(filteredData, i); // Re-render into svg12
     }
     
 
@@ -641,12 +642,14 @@ function updateSelectedCountries() {
   checkboxContainer.selectAll("input").each(function () {
     if (this.checked) selected.push(this.value);
   });
-  updateStreamGraph(selected);
+  updateStreamGraph(selected, 12);
 
 }
 
-makeStreamGraph(top10, 11);        
-updateStreamGraph(top10);          
+makeStreamGraph(top10, 11); 
+updateStreamGraph(top10, 11); 
+makeStreamGraph(top10, 12);          
+updateStreamGraph(top10, 12);          
 
 
   })
