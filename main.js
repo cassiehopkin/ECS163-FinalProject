@@ -231,15 +231,15 @@ Promise.all(csvs.map(file => d3.csv(file)))
     makeScatterPlot(populationData.find( c => c.year == "1960" ).data, "population", "1960", 2);
     makeScatterPlot(populationData.find( c => c.year == "2000" ).data, "population", "2000", 3);
 
-    // gdp plots
-    makeScatterPlot(gdpData.find( c => c.year == "1920" ).data, "gdp", "1920", 4);
-    makeScatterPlot(gdpData.find( c => c.year == "1960" ).data, "gdp", "1960", 5);
-    makeScatterPlot(gdpData.find( c => c.year == "2000" ).data, "gdp", "2000", 6);
-
     // host plots
-    makeScatterPlot(hostData.find( c => c.year == "1920" ).data, "host", "1920", 7);
-    makeScatterPlot(hostData.find( c => c.year == "1960" ).data, "host", "1960", 8);
-    makeScatterPlot(hostData.find( c => c.year == "2000" ).data, "host", "2000", 9);
+    makeScatterPlot(hostData.find( c => c.year == "1920" ).data.sort(function(x, y){return d3.ascending(x.host, y.host);}), "host", "1920", 4);
+    makeScatterPlot(hostData.find( c => c.year == "1960" ).data.sort(function(x, y){return d3.ascending(x.host, y.host);}), "host", "1960", 5);
+    makeScatterPlot(hostData.find( c => c.year == "2000" ).data.sort(function(x, y){return d3.ascending(x.host, y.host);}), "host", "2000", 6);
+
+        // gdp plots
+    makeScatterPlot(gdpData.find( c => c.year == "1920" ).data, "gdp", "1920", 7);
+    makeScatterPlot(gdpData.find( c => c.year == "1960" ).data, "gdp", "1960", 8);
+    makeScatterPlot(gdpData.find( c => c.year == "2000" ).data, "gdp", "2000", 9);
 
     // stream graph 
     function makeStreamGraph(data, i) {
