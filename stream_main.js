@@ -7,7 +7,6 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       nocToCountry[d.NOC] = d.Country;
     });
 
-
     // Parse Data //////////////////////////////////////////////////////////////////////////////////////
     const rawOlympicData = dataArray[0];
     const rawConflictData = dataArray[4];
@@ -35,7 +34,6 @@ Promise.all(csvs.map((file) => d3.csv(file)))
     }
 
     const conflictData = processConflictData();
-
 
     // Visualizations ////////////////////////////////////////////////////////////////////////////
 
@@ -70,13 +68,13 @@ Promise.all(csvs.map((file) => d3.csv(file)))
 
       //Extract top 10
       const keys = Object.keys(streamData[0]).filter((k) => k !== "year");
-      const stack = d3.stack().keys(keys).offset(d3.stackOffsetWiggle);
+      const stack = d3.stack().keys(keys).offset(d3.stackOffsetNone);
       const series = stack(streamData);
 
       //Dimensions
       const width = 1200;
-      const contextHeight = 130;
-      const contextMarginTop = 35;
+      const contextHeight = 160;
+      const contextMarginTop = 60;
       const focusHeight = 250;
       const whiteSpaceTop = 100;
       const margin = { top: 50, right: 200, bottom: 10, left: 60 };
@@ -110,8 +108,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           .attr("y", margin.top)
           .attr("width", (d) => xScale(d.end) - xScale(d.start))
           .attr("height", height - whiteSpaceTop - margin.bottom - focusHeight)
-          .attr("fill", "red")
-          .attr("opacity", 0.1)
+          .attr("fill", "#d6def0")
+          .attr("opacity", 0.5)
           .on("mouseover", function (event, d) {
             tooltip
               .html(`<strong>${d.event}</strong><br>` + `${d.start} - ${d.end}`)
@@ -316,14 +314,37 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("font-weight", "bold")
         .style("font-size", "15px");
 
+      svg
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", (width - margin.left - margin.right) / 2 + margin.left)
+        .attr("y", whiteSpaceTop + focusHeight + 50)
+        .attr("font-weight", "bold")
+        .style("font-size", "17px")
+        .text("Years");
+
+        svg
+          .append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", `rotate(-90)`)
+          .attr("x", -(whiteSpaceTop + focusHeight / 2))
+          .attr("y", margin.left - 45)
+          .attr("font-weight", "bold")
+          .style("font-size", "17px")
+          .text("Number of Total Medals");
+
       //Create y axis with no labels + ticks
       svg
         .append("g")
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y))
+        .call((g) => g
+            .selectAll(".tick text")
+            .style("font-weight", "bold")
+            .style("font-size", "15px")
+        )
         .select(".domain")
-        .attr("stroke", "black")
-        .attr("font-weight", "bold");
+        .attr("stroke", "black");
 
       // Draw Context Layers
       svg
@@ -346,6 +367,15 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("font-weight", "bold")
         .attr("font-size", "14px");
 
+      svg
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", (width - margin.left - margin.right) / 2 + margin.left)
+        .attr("y", whiteSpaceTop + focusHeight + 210)
+        .attr("font-weight", "bold")
+        .style("font-size", "17px")
+        .text("Years");
+
       // set default position and size of brush window in the context field
       const defaultView = [x(x.domain()[0]), x(x.domain()[0] + 20)];
 
@@ -363,7 +393,6 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .on("end", brushended);
 
       const gb = svg.append("g").call(brush).call(brush.move, defaultView);
-
 
       // define brush behavior
       function brushed({ selection }) {
@@ -384,7 +413,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         }
       }
 
-      //Title
+      // Chart Title
       svg
         .append("text")
         .attr("x", width / 6)
