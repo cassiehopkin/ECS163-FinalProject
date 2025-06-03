@@ -72,12 +72,12 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       const series = stack(streamData);
 
       //Dimensions
-      const width = 1200;
+      const width = 1350;
       const contextHeight = 160;
       const contextMarginTop = 60;
       const focusHeight = 250;
       const whiteSpaceTop = 100;
-      const margin = { top: 50, right: 200, bottom: 10, left: 60 };
+      const margin = { top: 50, right: 260, bottom: 10, left: 70 };
       const height =
         focusHeight +
         contextHeight +

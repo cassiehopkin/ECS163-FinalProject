@@ -379,9 +379,9 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       const series = stack(streamData);
 
       //Dimensions
-      const width = 1200;
+      const width = 1300;
       const height = 500;
-      const margin = { top: 80, right: 100, bottom: 40, left: 100 };
+      const margin = { top: 75, right: 260, bottom: 50, left: 100 };
 
       //Create svg
       const svg = d3
