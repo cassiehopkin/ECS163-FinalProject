@@ -482,7 +482,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("y", margin.top / 2)
         .attr("font-weight", "bold")
         .style("font-size", "25px")
-        .text("Olympic Medals by Country (Top 10 Stream Graph)");
+        .text("Top 10 Countries by Total Olympic Medals");
 
       //Legend
       const legend = svg
@@ -498,7 +498,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("y", -20)
         .attr("font-weight", "bold")
         .attr("font-size", "18px")
-        .text("Top 10 Countries Ascending");
+        .text("Countries Ascending by");
 
       legend
         .append("text")
@@ -506,7 +506,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("y", + 3) 
         .attr("font-weight", "bold")
         .attr("font-size", "18px")
-        .text("by Total Medals");
+        .text("Total Medal Count");
 
         const legendValues = legend
           .append("g")
