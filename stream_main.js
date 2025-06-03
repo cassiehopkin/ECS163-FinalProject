@@ -328,10 +328,10 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           .attr("text-anchor", "middle")
           .attr("transform", `rotate(-90)`)
           .attr("x", -(whiteSpaceTop + focusHeight / 2))
-          .attr("y", margin.left - 45)
+          .attr("y", margin.left - 50)
           .attr("font-weight", "bold")
           .style("font-size", "17px")
-          .text("Number of Total Medals");
+          .text("Total Medals Per Game");
 
       //Create y axis with no labels + ticks
       svg

@@ -375,7 +375,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
 
       //Extract top 10
       const keys = Object.keys(streamData[0]).filter((k) => k !== "year");
-      const stack = d3.stack().keys(keys).offset(d3.stackOffsetWiggle);
+      const stack = d3.stack().keys(keys).offset(d3.stackOffsetNone);
       const series = stack(streamData);
 
       //Dimensions
@@ -407,8 +407,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       svg
         .append("text")
         .attr("text-anchor", "middle")
-        .attr("x", -(margin.top + (height - margin.top - margin.bottom) / 2)) 
-        .attr("y", margin.left - 70) 
+        .attr("x", -(margin.top + (height - margin.top - margin.bottom) / 2))
+        .attr("y", margin.left - 70)
         .attr("font-weight", "bold")
         .style("font-size", "17px");
 
@@ -416,11 +416,11 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .append("text")
         .attr("text-anchor", "middle")
         .attr("transform", `rotate(-90)`)
-        .attr("x", -(margin.top + (height - margin.top - margin.bottom) / 2)) 
-        .attr("y", margin.left - 55) 
+        .attr("x", -(margin.top + (height - margin.top - margin.bottom) / 2))
+        .attr("y", margin.left - 55)
         .attr("font-weight", "bold")
         .style("font-size", "17px")
-        .text("Number of Total Medals");
+        .text("Total Medals Per Game");
 
       //Color Scheme
       const color = d3.scaleOrdinal().domain(keys).range(d3.schemeTableau10);
@@ -492,8 +492,28 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           `translate(${width - margin.right + 20}, ${margin.top})`
         );
 
+      legend
+        .append("text")
+        .attr("x", 0)
+        .attr("y", -20)
+        .attr("font-weight", "bold")
+        .attr("font-size", "18px")
+        .text("Top 10 Countries Ascending");
+
+      legend
+        .append("text")
+        .attr("x", 0)
+        .attr("y", + 3) 
+        .attr("font-weight", "bold")
+        .attr("font-size", "18px")
+        .text("by Total Medals");
+
+        const legendValues = legend
+          .append("g")
+          .attr("transform", `translate(0, 20)`);
+
       keys.forEach((key, i) => {
-        const row = legend
+        const row = legendValues
           .append("g")
           .attr("transform", `translate(0, ${i * 20})`);
 
