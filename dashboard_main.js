@@ -157,7 +157,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
       gdpSvg.append("text").attr("text-anchor", "middle").attr("x", (scatterMargin.left + scatterWidth - scatterMargin.right) / 2).attr("y", scatterMargin.top / 2).attr("font-weight", "bold").style("font-size", "25px")
           .text("GDP vs. Medals Won");
       hostSvg.append("text").attr("text-anchor", "middle").attr("x", (scatterMargin.left + scatterWidth - scatterMargin.right) / 2).attr("y", scatterMargin.top / 2).attr("font-weight", "bold").style("font-size", "25px")
-          .text("Hosting or Not vs. Medals Won");
+          .text("Hosting Status vs. Medals Won");
 
       // x axis Labels
       populationSvg.append("text").attr("text-anchor", "middle").attr("x", (scatterMargin.left + scatterWidth - scatterMargin.right) / 2).attr("y", scatterHeight - 5).attr("font-weight", "bold").style("font-size", "15px")
@@ -165,7 +165,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
       gdpSvg.append("text").attr("text-anchor", "middle").attr("x", (scatterMargin.left + scatterWidth - scatterMargin.right) / 2).attr("y", scatterHeight - 5).attr("font-weight", "bold").style("font-size", "15px")
           .text("GDP in Millions of USD");
       hostSvg.append("text").attr("text-anchor", "middle").attr("x", (scatterMargin.left + scatterWidth - scatterMargin.right) / 2).attr("y", scatterHeight - 5).attr("font-weight", "bold").style("font-size", "15px")
-          .text("Hosting or Not");
+          .text("Hosting Status");
 
       // y axis labels
       populationSvg.append("text").attr("text-anchor", "start").attr("x", scatterMargin.left - 20).attr("y", scatterMargin.top - 15).attr("font-weight", "bold").style("font-size", "15px").text("Medals Won");

@@ -192,7 +192,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("y", margin.top / 2)
         .attr("font-weight", "bold")
         .style("font-size", "25px")
-        .text(factor == "host" ? "Hosting or Not"
+        .text(factor == "host" ? "Hosting Status"
             : factor == "gdp" ? "GDP" : "Population" + " vs. Medals Won - " + year);
 
       // Create the x axis label
@@ -203,7 +203,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("y", height - 5)
         .attr("font-weight", "bold")
         .style("font-size", "15px")
-        .text(factor == "host" ? "Hosting or Not"
+        .text(factor == "host" ? "Hosting Status"
             : factor == "gdp" ? "GDP in Millions of USD" : "Population in Thousands");
 
       // Create the y axis label
