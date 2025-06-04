@@ -1,5 +1,3 @@
-// const csvs = ["ALL_MEDALISTS_modified.csv", "GDP_Data_Year_1_To_2008_modified.csv", "Population_Data_Year_1_To_2008_modified.csv", "NOC_CODES_modified.csv"];
-
 Promise.all(csvs.map(file => d3.csv(file)))
   .then(function(dataArray) {
     // Global Assets /////////////////////////////////////////////////////////////////////////////////
@@ -157,22 +155,22 @@ Promise.all(csvs.map(file => d3.csv(file)))
       populationSvg.append("text").attr("text-anchor", "middle").attr("x", (scatterMargin.left + scatterWidth - scatterMargin.right) / 2).attr("y", scatterMargin.top / 2).attr("font-weight", "bold").style("font-size", "25px")
           .text("Population vs. Medals Won");
       gdpSvg.append("text").attr("text-anchor", "middle").attr("x", (scatterMargin.left + scatterWidth - scatterMargin.right) / 2).attr("y", scatterMargin.top / 2).attr("font-weight", "bold").style("font-size", "25px")
-          .text("Gdp vs. Medals Won");
+          .text("GDP vs. Medals Won");
       hostSvg.append("text").attr("text-anchor", "middle").attr("x", (scatterMargin.left + scatterWidth - scatterMargin.right) / 2).attr("y", scatterMargin.top / 2).attr("font-weight", "bold").style("font-size", "25px")
           .text("Hosting or Not vs. Medals Won");
 
       // x axis Labels
       populationSvg.append("text").attr("text-anchor", "middle").attr("x", (scatterMargin.left + scatterWidth - scatterMargin.right) / 2).attr("y", scatterHeight - 5).attr("font-weight", "bold").style("font-size", "15px")
-          .text("Population in ...");
+          .text("Population in Thousands");
       gdpSvg.append("text").attr("text-anchor", "middle").attr("x", (scatterMargin.left + scatterWidth - scatterMargin.right) / 2).attr("y", scatterHeight - 5).attr("font-weight", "bold").style("font-size", "15px")
-          .text("GDP in ...");
+          .text("GDP in Millions of USD");
       hostSvg.append("text").attr("text-anchor", "middle").attr("x", (scatterMargin.left + scatterWidth - scatterMargin.right) / 2).attr("y", scatterHeight - 5).attr("font-weight", "bold").style("font-size", "15px")
           .text("Hosting or Not");
 
       // y axis labels
-      populationSvg.append("text").attr("text-anchor", "start").attr("x", scatterMargin.left - 20).attr("y", scatterMargin.top - 15).attr("font-weight", "bold").style("font-size", "15px").text("medals won");
-      gdpSvg.append("text").attr("text-anchor", "start").attr("x", scatterMargin.left - 20).attr("y", scatterMargin.top - 15).attr("font-weight", "bold").style("font-size", "15px").text("medals won");
-      hostSvg.append("text").attr("text-anchor", "start").attr("x", scatterMargin.left - 20).attr("y", scatterMargin.top - 15).attr("font-weight", "bold").style("font-size", "15px").text("medals won");
+      populationSvg.append("text").attr("text-anchor", "start").attr("x", scatterMargin.left - 20).attr("y", scatterMargin.top - 15).attr("font-weight", "bold").style("font-size", "15px").text("Medals Won");
+      gdpSvg.append("text").attr("text-anchor", "start").attr("x", scatterMargin.left - 20).attr("y", scatterMargin.top - 15).attr("font-weight", "bold").style("font-size", "15px").text("Medals Won");
+      hostSvg.append("text").attr("text-anchor", "start").attr("x", scatterMargin.left - 20).attr("y", scatterMargin.top - 15).attr("font-weight", "bold").style("font-size", "15px").text("Medals Won");
 
       // x axes
       const populationX = d3.scaleLog().domain([d3.min(scatterPopulationData, d => d.population), d3.max(scatterPopulationData, d => d.population)]).range([scatterMargin.left, scatterWidth - scatterMargin.right]);

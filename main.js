@@ -1,9 +1,9 @@
 const csvs = [
-  "ALL_MEDALISTS_modified.csv",
-  "GDP_Data_Year_1_To_2008_modified.csv",
-  "Population_Data_Year_1_To_2008_modified.csv",
-  "NOC_CODES_modified.csv",
-  "wiki_wars.csv",
+  "data/ALL_MEDALISTS_modified.csv",
+  "data/GDP_Data_Year_1_To_2008_modified.csv",
+  "data/Population_Data_Year_1_To_2008_modified.csv",
+  "data/NOC_CODES_modified.csv",
+  "data/wiki_wars.csv",
 ];
 
 Promise.all(csvs.map((file) => d3.csv(file)))
@@ -192,7 +192,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("y", margin.top / 2)
         .attr("font-weight", "bold")
         .style("font-size", "25px")
-        .text(factor + " vs. medals won - " + year);
+        .text(factor == "host" ? "Hosting or Not"
+            : factor == "gdp" ? "GDP" : "Population" + " vs. Medals Won - " + year);
 
       // Create the x axis label
       svg
@@ -202,7 +203,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("y", height - 5)
         .attr("font-weight", "bold")
         .style("font-size", "15px")
-        .text(factor);
+        .text(factor == "host" ? "Hosting or Not"
+            : factor == "gdp" ? "GDP in Millions of USD" : "Population in Thousands");
 
       // Create the y axis label
       svg
@@ -212,7 +214,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("y", margin.top - 15)
         .attr("font-weight", "bold")
         .style("font-size", "15px")
-        .text("medals won");
+        .text("Medals Won");
 
       minVal = d3.min(data, (d) => d[factor]);
       if (d3.min(data, (d) => d[factor]) == 0) {
@@ -225,9 +227,9 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           : d3.scaleLog().domain([minVal, d3.max(data, (d) => d[factor])]);
       x.range([margin.left, width - margin.right]);
 
+      // https://d3js.org/d3-axis#axis_tickFormat
       const xAxis = (g) =>
-        g
-          .attr("transform", "translate(0," + (height - margin.bottom) + ")")
+        g.attr("transform", "translate(0," + (height - margin.bottom) + ")")
           .call(d3.axisBottom(x));
       svg.append("g").call(xAxis);
 
@@ -237,8 +239,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .domain([0, d3.max(data, (d) => d.medals)])
         .rangeRound([height - margin.bottom, margin.top]);
       const yAxis = (g) =>
-        g
-          .attr("transform", "translate(" + margin.left + ",0)")
+        g.attr("transform", "translate(" + margin.left + ",0)")
           .call(d3.axisLeft(y));
       svg.append("g").call(yAxis);
 

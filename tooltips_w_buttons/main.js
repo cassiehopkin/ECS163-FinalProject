@@ -21,10 +21,10 @@ async function main() {
     return placementHierarchy.find(d => d.id === id).placement;
   }
 
-  const rawOlympicData = await d3.csv("ALL_MEDALISTS_modified@3.csv", d3.autoType);
-  const rawGdpData = await d3.csv("GDP_Data_Year_1_To_2008_modified@2.csv", d3.autoType);
-  const rawPopulationData = await d3.csv("Population_Data_Year_1_To_2008_modified@2.csv", d3.autoType);
-  const rawNocData = await d3.csv("NOC_CODES_modified.csv", d3.autoType);
+  const rawOlympicData = await d3.csv("../data/ALL_MEDALISTS_modified@3.csv", d3.autoType);
+  const rawGdpData = await d3.csv("../data/GDP_Data_Year_1_To_2008_modified@2.csv", d3.autoType);
+  const rawPopulationData = await d3.csv("../data/Population_Data_Year_1_To_2008_modified@2.csv", d3.autoType);
+  const rawNocData = await d3.csv("../data/NOC_CODES_modified.csv", d3.autoType);
 
   const nocMap = new Map(rawNocData.map(d => [d.NOC, d.Country]));
 

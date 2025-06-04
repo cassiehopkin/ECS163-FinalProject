@@ -1,9 +1,9 @@
 const csvs = [
-  "ALL_MEDALISTS_modified@3.csv",
-  "GDP_Data_Year_1_To_2008_modified@2.csv",
-  "Population_Data_Year_1_To_2008_modified@2.csv",
-  "NOC_CODES_modified.csv",
-  "wiki_wars.csv",
+  "../data/ALL_MEDALISTS_modified@3.csv",
+  "../data/GDP_Data_Year_1_To_2008_modified@2.csv",
+  "../data/Population_Data_Year_1_To_2008_modified@2.csv",
+  "../data/NOC_CODES_modified.csv",
+  "../data/wiki_wars.csv",
 ];
 
 Promise.all(csvs.map((file) => d3.csv(file)))
