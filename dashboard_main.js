@@ -19,6 +19,8 @@ Promise.all(csvs.map(file => d3.csv(file)))
       return (value / 1000).toFixed(2) + " million";
     }
 
+      // Create a data subset that contains the bronze, silver, and gold medals won by each
+      // country, as well as the country that was hosting the games for a given year
     function processOlympicData() {
       let formattedData = [];
       const allYears = {};
@@ -55,15 +57,16 @@ Promise.all(csvs.map(file => d3.csv(file)))
 
       return formattedData;
     }
-
     olympicData = processOlympicData();
 
-    // Array of all years
+      // Array of all years in which a summer Olympic games was held
     let years = []
     olympicData.forEach(d =>{
         years.push(d.year);
     })
 
+      // Create a data subset that contains the bronze, silver, and gold medals won by each
+      // country, as well as that country's population for a given year
     function processPopulationData(olympicData) {
       return years.map(year => {
         const countryMedals = olympicData.find(c => c.year == year).countryMedals;
@@ -84,6 +87,8 @@ Promise.all(csvs.map(file => d3.csv(file)))
     }
     populationData = processPopulationData(olympicData);
 
+      // Create a data subset that contains the bronze, silver, and gold medals won by each
+      // country, as well as that country's GDP for a given year
       function processGdpData(olympicData) {
         return years.map(year => {
           const countryMedals = olympicData.find(c => c.year == year).countryMedals;
@@ -102,9 +107,10 @@ Promise.all(csvs.map(file => d3.csv(file)))
           return { year: year, data: data };
         });
       }
-
     gdpData = processGdpData(olympicData);
 
+      // Create a data subset that contains the bronze, silver, and gold medals won by each
+      // country, as well as that country's hosting status for a given year
       function processHostData(olympicData) {
           const hostData = [];
           olympicData.forEach(d => {
@@ -207,7 +213,8 @@ Promise.all(csvs.map(file => d3.csv(file)))
       hostGy.call(hostYAxis);
 
       // dots
-      // https://observablehq.com/@d3/selection-join
+      // The following webpage was referenced in order to create transition animations within the
+      // join function: https://observablehq.com/@d3/selection-join
       function renderDots(){
           const populationT = populationSvg.transition().delay(50).duration(750);
           const gdpT = gdpSvg.transition().delay(50).duration(750);
@@ -254,6 +261,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
           })
               .on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
       }
+      // Create tooltips for each scatter plot
       addTooltip(populationSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"population"}: ${formatPopulation(d.population)}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
       addTooltip(gdpSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"gdp"}: ${d.gdp}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
       addTooltip(hostSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"host"}: ${d.host}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
@@ -261,6 +269,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
       // Heatmap ////////////////////////////////////////////////////////////////////////////
       const variables = ["Medals", "GDP", "Population", "Host"];
 
+      // Generate the Pearson Correlation data
       function generatePearsonData(){
           const host = olympicData.find((d) => d.year === userYear).host;
           const popData = populationData.find((d) => d.year === userYear).data;
@@ -354,6 +363,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
           .interpolator(d3.interpolateBlues)
           .domain([-0.65, 1.7]); // feel free to change the color shades
 
+      // Render the blocks
       function renderBlocks(){
           //Transition
           const t = svg.transition().delay(50).duration(750);
@@ -399,8 +409,10 @@ Promise.all(csvs.map(file => d3.csv(file)))
 
       // Dropdown Menu ////////////////////////////////////////////////////////////////////////////
       const dropdown = d3.select("#years");
+      // Update the graphs on the dashboard when the user selects a new year from the dropdown
       dropdown.on("change", function()
       {
+          // Set year to user selected year
           userYear = dropDownList.value;
 
           // Update scatter plots
@@ -408,6 +420,7 @@ Promise.all(csvs.map(file => d3.csv(file)))
           scatterGdpData = gdpData.find( c => c.year == userYear ).data;
           scatterHostData = hostData.find( c => c.year == userYear ).data.sort(function(x, y){return d3.ascending(x.host, y.host);});
 
+          // Update axes
           populationX.domain([d3.min(scatterPopulationData, d => d.population), d3.max(scatterPopulationData, d => d.population)]);
           gdpX.domain([d3.min(scatterGdpData, d => d.gdp), d3.max(scatterGdpData, d => d.gdp)]);
 
@@ -422,7 +435,9 @@ Promise.all(csvs.map(file => d3.csv(file)))
           gdpGy.transition().delay(50).duration(750).call(gdpYAxis);
           hostGy.transition().delay(50).duration(750).call(hostYAxis);
 
+          // Update dots
           renderDots();
+          // Update tooltips
           addTooltip(populationSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"population"}: ${formatPopulation(d.population)}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
           addTooltip(gdpSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"gdp"}: ${d.gdp}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
           addTooltip(hostSvg, d => `Country: ${nocMap.get(d.NOC) || d.NOC}<br>${"host"}: ${d.host}<br>Total Medals: ${d.medals}<br>Gold: ${d.gold || 0}<br>Silver: ${d.silver || 0}<br>Bronze: ${d.bronze || 0}`);
