@@ -49,12 +49,16 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           (d) => d.NOC
         )
         .sort((a, b) => d3.descending(a[1], b[1]))
-        .slice(0, 10)
+        //.slice(0, 10)
         .map((d) => d[0]);
 
       //const years = Array.from(new Set(filtered.map((d) => +d.Edition))).sort();
       const years = Array.from(new Set(filtered.map((d) => +d.Edition))).sort();
 
+      if (filtered.length === 0) {
+        drawEmptyStreamGraph(12); // Custom function below
+        return;
+      }
       // Reshaping Data for stream graph
       const streamData = years.map((year) => {
         const row = { year };
@@ -87,8 +91,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
 
       //Create svg
       const svg = d3
-        .select(`#svg${i}`)
-        .insert("svg", ".my-box")
+        .select("#streamGraph12Container")
+        .append("svg")
         .attr("viewBox", [0, 0, width, height])
         .style("display", "block");
 
@@ -117,8 +121,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           })
           .on("mousemove", function (event) {
             tooltip
-              .style("left", event.pageX + 15 + "px")
-              .style("top", event.pageY - 28 + "px");
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 28) + "px");
           })
           .on("mouseleave", function () {
             tooltip.style("display", "none");
@@ -258,8 +262,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
                   `Silver: ${silver}<br>` +
                   `Bronze: ${bronze}`
               )
-              .style("left", event.pageX + 15 + "px")
-              .style("top", event.pageY - 28 + "px");
+              .style("left", (event.pageX - 225) + "px")
+              .style("top", (event.pageY ) + "px");
           } else {
             // No data — find nearest years with data
             const allYearsWithMedals = [
@@ -291,8 +295,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
                   `Year: ${hoveredYear}<br>` +
                   `${suggestion}`
               )
-              .style("left", event.pageX + 15 + "px")
-              .style("top", event.pageY - 28 + "px");
+              .style("left", (event.clientX + 15) + "px")
+              .style("top", (event.clientY + window.scrollY - 28) + "px");
           }
         })
         .on("mouseleave", function () {
@@ -420,58 +424,169 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("y", margin.top - 10)
         .attr("font-weight", "bold")
         .style("font-size", "25px")
-        .text("Top 10 Countries by Total Olympic Medals");
+        .text("Top Olympic Medals per Country");
 
       //Legend
-      const legend = svg
-        .append("g")
-        .attr(
-          "transform",
-          `translate(${width - margin.right + 20}, ${margin.top + 25})`
-        );
+      const legendContainer = svg.append("foreignObject")
+        .attr("x", width - margin.right+30)
+        .attr("y", margin.top)
+        .attr("width", 230)
+        .attr("height", 400);
 
-        legend
-          .append("text")
-          .attr("x", 0)
-          .attr("y", -20)
-          .attr("font-weight", "bold")
-          .attr("font-size", "18px")
-          .text("Countries Ascending by");
+      const legendDiv = legendContainer.append("xhtml:div")
+        .style("overflow-y", "auto")
+        .style("max-height", "380px")
+        .style("padding-right", "10px");
 
-        legend
-          .append("text")
-          .attr("x", 0)
-          .attr("y", +3)
-          .attr("font-weight", "bold")
-          .attr("font-size", "18px")
-          .text("Total Medal Count");
+      legendDiv.append("div")
+        .style("font-weight", "bold")
+        .style("font-size", "18px")
+        .style("margin-bottom", "10px")
+        .html("Countries by Medal Count");
 
-          const legendValues = legend
-            .append("g")
-            .attr("transform", `translate(0, 20)`);
+      const legendItems = legendDiv.selectAll("div.legend-row")
+        .data(keys)
+        .enter()
+        .append("div")
+        .attr("class", "legend-row")
+        .style("display", "flex")
+        .style("align-items", "center")
+        .style("margin-bottom", "4px");
 
-      keys.forEach((key, i) => {
-        const row = legendValues
-          .append("g")
-          .attr("transform", `translate(0, ${i * 20})`);
+      legendItems.append("div")
+        .style("width", "12px")
+        .style("height", "12px")
+        .style("background-color", d => color(d))
+        .style("margin-right", "6px");
 
-        row
-          .append("rect")
-          .attr("width", 12)
-          .attr("height", 12)
-          .attr("fill", color(key));
+      legendItems.append("span")
+        .style("font-weight", "bold")
+        .style("font-size", "14px")
+        .text(d => nocToCountry[d] || d);
 
-        row
-          .append("text")
-          .attr("x", 16)
-          .attr("y", 10)
-          .text(nocToCountry[key] || key)
-          .attr("alignment-baseline", "middle")
-          .attr("font-weight", "bold")
-          .attr("font-size", "15px");
-      });
     }
-    makeStreamGraph(rawOlympicData, 13);
+    function drawEmptyStreamGraph(i) {
+      const width = 1300;
+      const height = 500;
+      const margin = { top: 75, right: 260, bottom: 50, left: 100 };
+    
+      const svg = d3
+        .select("#streamGraph12Container")  
+        .append("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .style("display", "block");
+        
+      const x = d3.scaleLinear().domain([1896, 2020]).range([margin.left, width - margin.right]);
+      const y = d3.scaleLinear().domain([0, 100]).range([height - margin.bottom, margin.top]);
+    
+      // Axes
+      svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x).tickFormat(d3.format("d")))
+        .attr("font-weight", "bold")
+        .style("font-size", "15px");
+    
+      svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y))
+        .call((g) =>
+          g.selectAll(".tick text")
+            .style("font-weight", "bold")
+            .style("font-size", "15px"))
+        .select(".domain")
+        .attr("stroke", "black");
+    
+      // Axis labels
+      svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", (width - margin.left - margin.right) / 2 + margin.left)
+        .attr("y", margin.top + height - 75)
+        .attr("font-weight", "bold")
+        .style("font-size", "17px")
+        .text("Years");
+    
+      svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", `rotate(-90)`)
+        .attr("x", -(margin.top + (height - margin.top - margin.bottom) / 2))
+        .attr("y", margin.left - 55)
+        .attr("font-weight", "bold")
+        .style("font-size", "17px")
+        .text("Total Medals Per Game");
+    
+      svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", (margin.left + width - margin.right) / 2)
+        .attr("y", margin.top / 2)
+        .attr("font-weight", "bold")
+        .style("font-size", "25px")
+        .text("No Countries Selected");
+    }
+    
+
+    function updateStreamGraph(selectedNOCs) {
+      d3.select("#streamGraph12Container").selectAll("svg").remove();  // Remove old graph
+      const filteredData = rawOlympicData.filter(d => selectedNOCs.includes(d.NOC));
+      makeStreamGraph(filteredData); // Re-render into svg12
+    }
+    
+
+// Get all unique NOCs (countries)
+const uniqueNOCs = Array.from(new Set(rawOlympicData.map(d => d.NOC)));
+
+// filtering top 10 countries for default graph
+const top10 = d3.rollups(
+  rawOlympicData.filter(d => d.Medal && d.Medal !== "NA"),
+  v => v.length,
+  d => d.NOC
+)
+  .sort((a, b) => d3.descending(a[1], b[1]))
+  .slice(0, 10)
+  .map(d => d[0]);
+
+// Checkboxes
+const checkboxContainer = d3.select("#checkboxContainer2");
+
+uniqueNOCs.sort((a, b) => (nocToCountry[a] || a).localeCompare(nocToCountry[b] || b));
+
+uniqueNOCs.forEach(noc => {
+  const label = checkboxContainer.append("label").style("display", "block");
+  label.append("input")
+    .attr("type", "checkbox")
+    .attr("value", noc)
+    .property("checked", top10.includes(noc)) //defaulting to top 10
+    .on("change", updateSelectedCountries);
+
+  label.append("span").text(" " + (nocToCountry[noc] || noc));
+});
+
+  // select all
+
+  d3.select("#selectAllBtn2").on("click", () => {
+    checkboxContainer.selectAll("input").property("checked", true);
+    updateSelectedCountries();
+  });
+  
+  // clear all
+  d3.select("#clearAllBtn2").on("click", () => {
+    checkboxContainer.selectAll("input").property("checked", false);
+    updateSelectedCountries();
+  });
+
+//updates stream graph based on selection
+function updateSelectedCountries() {
+  const selected = [];
+  checkboxContainer.selectAll("input").each(function () {
+    if (this.checked) selected.push(this.value);
+  });
+  updateStreamGraph(selected);
+
+}
+
+
+updateStreamGraph(top10);        
+
+
   })
   .catch(function (error) {
     console.error("Error:", error);
