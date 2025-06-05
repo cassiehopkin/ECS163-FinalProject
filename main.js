@@ -192,8 +192,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("y", margin.top / 2)
         .attr("font-weight", "bold")
         .style("font-size", "25px")
-        .text(factor == "host" ? "Hosting Status"
-            : factor == "gdp" ? "GDP" : "Population" + " vs. Medals Won - " + year);
+        .text(factor == "host" ? "Hosting Status vs. Medals Won - " + year
+            : factor == "gdp" ? "GDP" + " vs. Medals Won - " + year : "Population" + " vs. Medals Won - " + year);
 
       // Create the x axis label
       svg
