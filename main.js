@@ -314,7 +314,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       5
     );
     makeScatterPlot(
-      gdpData.find((c) => c.year == "1912").data,
+      gdpData.find((c) => c.year == "1964").data,
       "gdp",
       "1964",
       6
