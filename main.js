@@ -274,69 +274,65 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       );
     }
 
-    // population plots
+    // 1912
     makeScatterPlot(
-      populationData.find((c) => c.year == "1920").data,
+      populationData.find((c) => c.year == "1912").data,
       "population",
-      "1920",
+      "1912",
       1
     );
     makeScatterPlot(
-      populationData.find((c) => c.year == "1960").data,
-      "population",
-      "1960",
+      gdpData.find((c) => c.year == "1912").data,
+      "gdp",
+      "1912",
       2
     );
     makeScatterPlot(
-      populationData.find((c) => c.year == "2000").data,
-      "population",
-      "2000",
-      3
-    );
-
-    // host plots
-    makeScatterPlot(
-      hostData
-        .find((c) => c.year == "1920")
-        .data.sort(function (x, y) {
+      hostData.find((c) => c.year == "1912").data.sort(function (x, y) {
           return d3.ascending(x.host, y.host);
         }),
       "host",
-      "1920",
+      "1912",
+      3
+    );
+
+    // 1964
+    makeScatterPlot(
+      populationData.find((c) => c.year == "1964").data,
+      "population",
+      "1964",
       4
     );
     makeScatterPlot(
       hostData
-        .find((c) => c.year == "1960")
+        .find((c) => c.year == "1964")
         .data.sort(function (x, y) {
           return d3.ascending(x.host, y.host);
         }),
       "host",
-      "1960",
+      "1964",
       5
     );
     makeScatterPlot(
-      hostData
-        .find((c) => c.year == "2000")
-        .data.sort(function (x, y) {
+      gdpData.find((c) => c.year == "1912").data,
+      "gdp",
+      "1964",
+      6
+    );
+
+    // 2000
+    makeScatterPlot(
+      populationData.find((c) => c.year == "2000").data,
+      "population",
+      "2000",
+      7
+    );
+    makeScatterPlot(
+      hostData.find((c) => c.year == "2000").data.sort(function (x, y) {
           return d3.ascending(x.host, y.host);
         }),
       "host",
       "2000",
-      6
-    );
-
-    // gdp plots
-    makeScatterPlot(
-      gdpData.find((c) => c.year == "1920").data,
-      "gdp",
-      "1920",
-      7
-    );
-    makeScatterPlot(
-      gdpData.find((c) => c.year == "1960").data,
-      "gdp",
-      "1960",
       8
     );
     makeScatterPlot(
