@@ -1,3 +1,4 @@
+// Datasets /////////////////////////////////////////////////////////////////////////////////
 const csvs = [
   "data/ALL_MEDALISTS_modified.csv",
   "data/GDP_Data_Year_1_To_2008_modified.csv",
@@ -8,7 +9,6 @@ const csvs = [
 
 Promise.all(csvs.map((file) => d3.csv(file)))
   .then(function (dataArray) {
-    // Global Assets /////////////////////////////////////////////////////////////////////////////////
 
     // Parse Data //////////////////////////////////////////////////////////////////////////////////////
     const rawOlympicData = dataArray[0];
@@ -26,6 +26,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
       return (value / 1000).toFixed(2) + " million";
     }
 
+    // Create a data subset that contains the bronze, silver, and gold medals won by each
+    // country, as well as the country that was hosting the games for a given year
     function processOlympicData() {
       let formattedData = [];
       const allYears = {};
@@ -62,15 +64,16 @@ Promise.all(csvs.map((file) => d3.csv(file)))
 
       return formattedData;
     }
-
     olympicData = processOlympicData();
 
-    // Array of all years
+    // Array of all years in which a summer Olympic games was held
     let years = [];
     olympicData.forEach((d) => {
       years.push(d.year);
     });
 
+    // Create a data subset that contains the bronze, silver, and gold medals won by each
+    // country, as well as that country's population for a given year
     function processPopulationData(olympicData) {
       return years.map((year) => {
         const countryMedals = olympicData.find(
@@ -98,6 +101,8 @@ Promise.all(csvs.map((file) => d3.csv(file)))
     }
     populationData = processPopulationData(olympicData);
 
+    // Create a data subset that contains the bronze, silver, and gold medals won by each
+    // country, as well as that country's GDP for a given year
     function processGdpData(olympicData) {
       return years.map((year) => {
         const countryMedals = olympicData.find(
@@ -123,9 +128,10 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         return { year, data };
       });
     }
-
     gdpData = processGdpData(olympicData);
 
+    // Create a data subset that contains the bronze, silver, and gold medals won by each
+    // country, as well as that country's hosting status for a given year
     function processHostData(olympicData) {
       const hostData = [];
       olympicData.forEach((d) => {
@@ -149,6 +155,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
     hostData = processHostData(olympicData);
 
     // Visualizations ////////////////////////////////////////////////////////////////////////////
+      // Tooltips
     function addTooltip(svg, circles, formatter) {
       const tooltip = d3
         .select("body")
@@ -172,8 +179,10 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           tooltip.transition().duration(500).style("opacity", 0)
         );
     }
+
+    // Function to create a scatter plot given a dataset
     function makeScatterPlot(data, factor, year, i) {
-      // // measurements
+        // measurements
       const width = 1200;
       const height = 500;
       const margin = { top: 80, right: 150, bottom: 40, left: 100 };
@@ -226,8 +235,6 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           ? d3.scaleBand().domain(data.map((d) => d[factor]))
           : d3.scaleLog().domain([minVal, d3.max(data, (d) => d[factor])]);
       x.range([margin.left, width - margin.right]);
-
-      // https://d3js.org/d3-axis#axis_tickFormat
       const xAxis = (g) =>
         g.attr("transform", "translate(0," + (height - margin.bottom) + ")")
           .call(d3.axisBottom(x));
@@ -243,12 +250,6 @@ Promise.all(csvs.map((file) => d3.csv(file)))
           .call(d3.axisLeft(y));
       svg.append("g").call(yAxis);
 
-      for (const d of data) {
-        if (x(d[factor]) == NaN) {
-          console.log(d[factor]);
-        }
-      }
-
       // Create the dots
       const circles = svg
         .selectAll("circle")
@@ -262,6 +263,7 @@ Promise.all(csvs.map((file) => d3.csv(file)))
         .attr("r", 5)
         .style("fill", "black");
 
+      // Add tooltips
       addTooltip(
         svg,
         circles,
